@@ -1,0 +1,11 @@
+{
+    "rhandsontable::editAddin" : {
+        "binding" : "editAddin",
+        "description" : "Interactively edit a data frame.",
+        "interactive" : true,
+        "name" : "Edit a Data Frame",
+        "ordinal" : 1,
+        "package" : "rhandsontable",
+        "title" : ""
+    }
+}

@@ -1,0 +1,5 @@
+help/doc/html/index.html,The R Language
+help/library/shiny/html/selectInput.html,R: Create a select list input control
+help/library/tidyr/html/gather.html,R: Gather columns into key-value pairs
+help/doc/html/Search?objects=1&port=8787,R: Search Results
+help/library/tidyr/html/spread.html,R: Spread a key-value pair across multiple columns

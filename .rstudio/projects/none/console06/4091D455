@@ -1,0 +1,12 @@
+]0;/home/rstudiorstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ ping one.nis.magic-nexus.eu
+PING one.nis.magic-nexus.eu (143.225.205.162) 56(84) bytes of data.
+^C
+--- one.nis.magic-nexus.eu ping statistics ---
+4 packets transmitted, 0 received, 100% packet loss, time 80ms
+
+]0;/home/rstudiorstudio@205c4bc50d94:~$ telnet
+bash: telnet: command not found
+]0;/home/rstudiorstudio@205c4bc50d94:~$ su[K[K[Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ [Krstudio@205c4bc50d94:~$ curl https://one.nis.magic-nexus.eu/nis_api/test
+{
+    "hello": "world"
+[Krstudio@205c4bc50d94:~$ 

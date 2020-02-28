@@ -1,0 +1,8 @@
+docker build -t magic-rstudio .
+
+
+docker create --name rstudio_local -p 3838:3838 -p 8788:8787 -e DISABLE_AUTH=true -e ADD=shiny -v /home/paula/Documentos/Shiny/Shiny-NIS3:/home/rstudio magic-rstudio
+
+docker start rstudio_local && docker logs rstudio_local -f
+
+

@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582026706818.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "52501E0B",
+    "lastKnownWriteTime" : 1582808119,
+    "last_content_update" : 1582808119740,
+    "path" : "~/server.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "268,2",
+        "docOutlineSize" : "217.97286082011522",
+        "docOutlineVisible" : "1",
+        "scrollLine" : "253"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

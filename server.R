@@ -532,16 +532,15 @@ function(input, output) {
                 choices = ind, selected = ind[3])
   })
   
-  #Plot espermatozoides
+  #Plot temporal
   
   output$temporal<-renderPlot({
     eum<-totalEUM()
     eum<-filter(eum, Scope == input$ScopeChoice, Level == input$LevelIndicator2)
-    tmp <- data
     # eum$ID <-seq.int(nrow(eum)) #TODO esto es una chanada, las filas no se deberían repetar
     eum<-eum[,!(colnames(eum) %in% c("Flow","Fund","Unit","indicator"))]%>%spread(indicator_Unit,value = Value)
-    ggplot(eum, aes(input$ind1 , input$ind2)) +
-      geom_point(aes(colour =  factor( System), size = input$ind3, alpha = Period))
+    ggplot(eum, aes(eum$input$ind1 , eum$input$ind2)) +
+      geom_point(aes(colour =  factor( System), size = eum[input$ind3], alpha = Period))
              
     
   })

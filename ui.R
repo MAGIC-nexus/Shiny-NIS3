@@ -43,7 +43,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  #            choices = Interfaces),
                                  uiOutput("InterfacesChoice1"),
                                  br(),
-                                 p("This pieplot shows the contribution of the selected interface ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
                                  
                                ),
                                mainPanel(
@@ -71,7 +71,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  #             choices = Interfaces)
                                  uiOutput("InterfacesChoice2"),
                                  br(),
-                                 p("This pieplot shows the contribution of the selected interface ( eg: water, LU..etc) to each System. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each System. Scenario Scope and Period needs to be chosen aswell ")
                                  
                                ),
                                mainPanel(
@@ -86,7 +86,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    ,tabPanel("Bar Chart by Processors",
                              sidebarLayout(
                                sidebarPanel(
-                                 p("This pieplot shows the contribution of the selected interface ( eg: water, LU..etc) comparing a group of processor shoosen by the user. Scenario Scope and Period needs to be chosen aswell "),
+                                 p("This plot shows the contribution of the selected interfaces ( eg: water, LU..etc) comparing a group of processor shoosen by the user. Scenario Scope and Period needs to be chosen aswell "),
                                  
                                  # 
                                  #                 selectInput("scenario3", "Choose a Scenario:",
@@ -211,23 +211,23 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    ) #end 
                    
                    
-                   # New tab with indicators Barplot Internal vs external  -----
+                   # New tab with temporal study of indicators  -----
                    
-                   #TODO use fluid row https://shiny.rstudio.com/gallery/basic-datatable.html
-                   ,tabPanel("EUM/EPM bar chart",
-                             sidebarLayout(
-                               sidebarPanel(
-                                 p("by choosing The interface types (flow types) to show,the fund interface type   and tying population a End use matrix or Environment Pressure Matrix will be show as an excel table"),
-                                 uiOutput("ind1"),
-                                 uiOutput("ind2"),
-                                 uiOutput("ind3")
-                               ),
-                               
-                               mainPanel(
-                                 plotOutput("temporal")
-                               )
-                             )
-                   ) #end 
+                   # #TODO use fluid row https://shiny.rstudio.com/gallery/basic-datatable.html
+                   # ,tabPanel("EUM/EPM bar chart",
+                   #           sidebarLayout(
+                   #             sidebarPanel(
+                   #               p("by choosing The interface types (flow types) to show,the fund interface type   and tying population a End use matrix or Environment Pressure Matrix will be show as an excel table"),
+                   #               uiOutput("ind1"),
+                   #               uiOutput("ind2"),
+                   #               uiOutput("ind3")
+                   #             ),
+                   #             
+                   #             mainPanel(
+                   #               plotOutput("temporal")
+                   #             )
+                   #           )
+                   # ) #end 
                    
                    
                    

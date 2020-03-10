@@ -2,6 +2,9 @@
 #ui<-# table view of the generated dist ribution
 shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    
+                   tabPanel(actionButton("close", "Close windows"),useShinyjs(),
+                           extendShinyjs(text = jscode, functions = c("closeWindow")),
+                           ),
                    # New tab with file input and table display -----
                    tabPanel("INPUT FILE ",
                             sidebarLayout(
@@ -10,11 +13,16 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                           accept =".xlsx"
                                           ),
                                 actionButton("act","click to update dataset input"),
+                                actionButton("logout","log out"),
                                 # actionButton("close","CLOSE NIS SESSION BEFORE LEAVE"), #ENCONTRAR ALGO QUE LO HAGA AUTOMÁTICAMENTE PARA CERRAR LA VENTANA
                                 # br(),
                                 # p("Choose your flow_graph_solution.csv and your separator in your csv file (usally ',') 
                                 # When the table is displayed properly click the botton ' 
                                 # click to update dataset input in order to navigate through the others tabs")
+                                #TODO controlar que estos mensajes salgan antes de que salga la tabla
+                                textOutput("logged"),
+                                textOutput("opened"),
+                                textOutput("worksheets")
                               ),
                               mainPanel(
                                 DT::dataTableOutput("sample_table")

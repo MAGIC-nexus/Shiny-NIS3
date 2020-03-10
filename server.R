@@ -1,5 +1,30 @@
-function(input, output) {
-
+function(input, output,session) {
+  
+  #close session and windows
+  observeEvent(input$close, {
+    print(c$close_session())
+    print(c$logout())
+    js$closeWindow()
+    stopApp()
+  })
+  
+  
+  #Just log out from Nis Client
+  observeEvent(input$logout, {
+    print(c$close_session())
+    print(c$logout())
+  })
+  
+  #log out when close the windows
+  #TODO probar en napoles porque aquí parece que no funciona
+  session$onSessionEnded(function() {
+    print(c$close_session())
+    print(c$logout())
+    stopApp()
+  })
+  
+  
+  
   # INPUT FILE TO NIS ----  
   df_products_upload <- reactive({
     inFile <- input$target_upload
@@ -12,11 +37,11 @@ function(input, output) {
     
     fname <- filename
     c$login("test_user")
-    print("Logged in")
+    output$logged<-renderText({"Logged in"})
     c$open_session()
-    print("Session opened")
+    output$opened<-renderText({"Session opened"})
     n <- c$load_workbook(fname, "NIS_agent", "NIS_agent@1")
-    print(paste("N worksheets: ",n))
+    output$worksheets<-renderText({paste("N worksheets: ",n)})
     r <- c$submit()
     print("Returned from submit")
     r <- c$query_available_datasets()
@@ -687,5 +712,8 @@ function(input, output) {
     
   })  
   
-  
+    # if (isClosed(session)) {
+    #   c$close_session()
+    #   c$logout()
+    # }
 } #END

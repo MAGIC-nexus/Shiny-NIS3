@@ -19,12 +19,7 @@ library(reticulate)
 library(shinyjs)
 nexinfosys <- import("nexinfosys")
 use_python("/opt/conda/bin/python3")
-# c <- nexinfosys$NISClient("http://0.0.0.0:5000/nis_api") 
-c <- nexinfosys$NISClient("https://one.nis.magic-nexus.eu/nis_api")
-
-jscode <- "shinyjs.closeWindow = function() { window.close(); }"
-
-
+# c <- nexinfosys$NISClient("http://0.0.0.0:5000/nis_api")
 
 gg.gauge <- function(eum,breaks=values) {
   rescale <- function(x) (x-min(x))/(max(x) - min(x)) * 100

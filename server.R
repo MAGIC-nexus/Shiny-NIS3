@@ -1,22 +1,8 @@
 function(input, output,session) {
   
   #close session and windows
-  observeEvent(input$close, {
-    print(c$close_session())
-    print(c$logout())
-    js$closeWindow()
-    stopApp()
-  })
-  
-  
-  #Just log out from Nis Client
-  observeEvent(input$logout, {
-    print(c$close_session())
-    print(c$logout())
-  })
-  
+ 
   #log out when close the windows
-  #TODO probar en napoles porque aquí parece que no funciona
   session$onSessionEnded(function() {
     print(c$close_session())
     print(c$logout())
@@ -31,30 +17,53 @@ function(input, output,session) {
     if (is.null(inFile))
       return(NULL)
     filename <- inFile$datapath
-    # if (length(df$Conflict) != 0){
-    #   df<-filter(df, df$Conflict != "Dismissed")
-    # }
-    
+    c <- nexinfosys$NISClient("https://one.nis.magic-nexus.eu/nis_api")
     fname <- filename
-    c$login("test_user")
-    output$logged<-renderText({"Logged in"})
+    try({print(c$close_session())
+         print(c$logout())
+    }, silent = FALSE)
+    
+    print(c$login("test_user"))
+    # output$logged<-renderText({"Logged in"})
     c$open_session()
-    output$opened<-renderText({"Session opened"})
+    # output$opened<-renderText({"Session opened"})
     n <- c$load_workbook(fname, "NIS_agent", "NIS_agent@1")
     output$worksheets<-renderText({paste("N worksheets: ",n)})
     r <- c$submit()
+    num_errors<- 0
+    if (length(r) > 0){
+      issues <- data.frame(matrix(unlist(r), nrow=length(r), byrow=T, ncol = 5))
+      colnames(issues)<-c("sheet","message","row","sheet_name","type")
+      for(i in r){
+        if (i["type"] == 3){
+          num_errors <-num_errors + 1
+        }
+      }
+      output$num_errors<-renderText({toString(num_errors)})
+    }
     print("Returned from submit")
-    r <- c$query_available_datasets()
-    ds <- c$query_datasets(c(tuple("flow_graph_solution", "csv", "dataframe")))
-    df <- py_to_r(ds[[1]][[3]])
-    df<-subset(df,select = -c(Conflict_Partof,Conflict_Itype,Computed,Expression,Observer))
-    df$Value<-as.numeric(lapply(df$Value,str_replace ,pattern = ",",replacement = "."))
-    return(df)
+    if (num_errors == 0){
+      r <- c$query_available_datasets()
+      ds <- c$query_datasets(c(tuple("flow_graph_solution", "csv", "dataframe")))
+      df <- py_to_r(ds[[1]][[3]])
+      #TODO quitar esto y poner todos los resultados
+      #TODO tendré que cambiar más código 
+      df<-subset(df,select = -c(Conflict_Partof,Conflict_Itype,Computed,Expression,Observer))
+      df$Value<-as.numeric(lapply(df$Value,str_replace ,pattern = ",",replacement = "."))
+    }else{
+      df<-issues
+    }
+      list(df1 = df, df2 = issues)
+
   })
   
-  
   output$sample_table<- renderDataTable({
-    df <- df_products_upload()
+    df <- df_products_upload()[['df1']]
+    DT::datatable(df)
+  })
+  
+  output$issues<- renderDataTable({
+    df <- df_products_upload()[['df2']]
     DT::datatable(df)
   })
   
@@ -64,20 +73,20 @@ function(input, output,session) {
   # INPUTS: 
   
   output$scenario = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scenarios <- as.vector(unique(datos$Scenario))
     selectInput('scenario', "Choose a Scenario:", Scenarios)
   })
   
   output$scope = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scopes<- as.vector(unique(datos$Scope))
     selectInput('scope', "Choose a Scope:", Scopes)
   })
   
   
   output$period = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     datos$Period<-as.numeric(datos$Period)
     Periods<- as.vector(unique(datos$Period))
     selectInput('period',  "Choose a Period:", Periods, selected = 2017)
@@ -85,14 +94,14 @@ function(input, output,session) {
   
   
   output$level = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Level <-as.vector(unique(datos$Level))
     selectInput('level', "Choose a level:", Level)
   })
   
   
   output$InterfacesChoice1 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Interfaces<- as.vector(unique(datos$Interface))
     checkboxGroupInput("InterfacesChoice1", "InterfacesTypes:",
                        choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
@@ -110,7 +119,7 @@ function(input, output,session) {
     
     #TODO  % Value
     # TODO nombre de los processors en vertical
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope == input$scope)
     df <- filter(df, Interface %in% input$InterfacesChoice1, )
     df$per<-round(df$Value/sum(df$Value)*100, digits = 3)
@@ -131,20 +140,20 @@ function(input, output,session) {
   # Reactive Inputs
   
   output$scenario2 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scenarios <- as.vector(unique(datos$Scenario))
     selectInput('scenario2', "Choose a Scenario:", Scenarios)
   })
   
   output$scope2 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scopes<<- as.vector(unique(datos$Scope))
     selectInput('scope2', "Choose a Scope:", Scopes)
   })
   
   
   output$period2 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     datos$Period<-as.numeric(datos$Period)
     Periods<- as.vector(unique(datos$Period))
     selectInput('period2',  "Choose a Period:", Periods)
@@ -153,7 +162,7 @@ function(input, output,session) {
   
   
   output$InterfacesChoice2 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Interfaces<- as.vector(unique(datos$Interface))
     checkboxGroupInput("InterfacesChoice2", "InterfacesTypes:",
                        choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
@@ -166,7 +175,7 @@ function(input, output,session) {
     if (input$act==0)
       return()
     #TODO  % Values 
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     df <- filter(data,data$Scenario == input$scenario2 & data$Period == input$period2 , data$Scope == input$scope2)
     df <- filter(df, Interface %in% input$InterfacesChoice2, )
     UnitList<- unique(df$Unit)
@@ -185,19 +194,19 @@ function(input, output,session) {
   # Reactive Inputs:
   
   output$scenario3 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scenarios <- as.vector(unique(datos$Scenario))
     selectInput('scenario3', "Choose a Scenario:", Scenarios)
   })
   
   output$scope3 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Scopes<- as.vector(unique(datos$Scope))
     selectInput('scope3', "Choose a Scope:", Scopes)
   })
   
   output$period3 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     datos$Period<-as.numeric(datos$Period)
     Periods<- as.vector(unique(datos$Period))
     selectInput('period3',  "Choose a Period:", Periods)
@@ -205,14 +214,14 @@ function(input, output,session) {
   
   
   output$ProcessorsChoice = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Processors<- as.vector(unique(datos$Processor))
     checkboxGroupInput("ProcessorsChoice", "Processors to compare:",
                        choiceNames = Processors, choiceValues = Processors, selected = Processors[1])
   })
   
   output$InterfacesChoice3 = renderUI({
-    datos<-df_products_upload()
+    datos<-df_products_upload()[['df1']]
     Interfaces<- as.vector(unique(datos$Interface))
     checkboxGroupInput("InterfacesChoice3", "InterfacesTypes:",
                        choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
@@ -222,7 +231,7 @@ function(input, output,session) {
   output$PiePlotProcessors <- renderPlot({
     if (input$act==0)
       return()
-    data<-df_products_upload()  
+    data<-df_products_upload()[['df1']] 
     df <- filter(data,data$Scenario == input$scenario3 &  data$Period == input$period3, data$Scope == input$scope3)
     df <- filter(df, Processor %in% input$ProcessorsChoice, )
     df <- filter(df, Interface %in% input$InterfacesChoice3, )
@@ -283,7 +292,7 @@ function(input, output,session) {
   # create balance flow graph solution-----
   
   BalanceEUM<-reactive({
-    dat<<-df_products_upload()
+    dat<<-df_products_upload()[['df1']]
     data_spread<-data%>%spread(Orientation,value = Value)
     data_spread$balance <- (flow_balanace$Input - flow_balanace$Output)
     data_gather<-data_gather%>%gather(key = c("Orientation", "Value"), value = c("Input","Output","balance"))
@@ -293,7 +302,7 @@ function(input, output,session) {
   # new Reactive EUM (all indicators in the same column) ----
   
   totalEUM<-reactive({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     # data <- BalanceEUM()
     df<-filter(data, data$Scenario == input$ScenarioChoice)
     eum <- filter(df, Interface %in% input$show_Interfaces,)
@@ -382,7 +391,7 @@ function(input, output,session) {
   #Reactive Inputs
   
   output$FundInterface= renderUI({
-    data<- df_products_upload()
+    data<- df_products_upload()[['df1']]
     Fund<- filter(data, data$RoegenType == "Fund" | data$RoegenType == "fund")
     FundInterfaces <- as.vector(unique(Fund$Interface))
     checkboxGroupInput("FundInterface", "Choose a Fund InterfaceType:",
@@ -390,7 +399,7 @@ function(input, output,session) {
   })
   
   output$ScopeChoice = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Scopes<- as.vector(unique(data$Scope))
     selectInput("ScopeChoice", "Choose a Scope:",
                 choices = Scopes, selected = Scopes[1]) 
@@ -398,13 +407,13 @@ function(input, output,session) {
   
   
   output$ScenarioChoice = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Scenarios <- as.vector(unique(data$Scenario))
     selectInput("ScenarioChoice", "Choose a Scenario:",
                 choices = Scenarios)
   })
   output$PeriodChoice = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     data$Period<-as.numeric(data$Period)
     Periods<- as.vector(unique(data$Period))
     selectInput("PeriodChoice", "Choose a Period:",
@@ -412,14 +421,14 @@ function(input, output,session) {
     
   })
   output$SystemChoice = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Systems<- as.vector (unique(data$System))
     selectInput("SystemChoice", "Choose a System:",
                 choices = Systems, selected = Systems[1])
   })
   
   output$show_Interfaces = renderUI({
-    data<- df_products_upload()
+    data<- df_products_upload()[['df1']]
     Flow<- filter(data, data$RoegenType == "flow" | data$RoegenType == "Flow")
     FlowInterfaces<- as.vector(unique(Flow$Interface))
     checkboxGroupInput("show_Interfaces", "Choose a flow InterfaceType to show:",
@@ -566,8 +575,6 @@ function(input, output,session) {
     eum<-eum[,!(colnames(eum) %in% c("Flow","Fund","Unit","indicator"))]%>%spread(indicator_Unit,value = Value)
     ggplot(eum, aes(eum$input$ind1 , eum$input$ind2)) +
       geom_point(aes(colour =  factor( System), size = eum[input$ind3], alpha = Period))
-             
-    
   })
 
   
@@ -605,14 +612,14 @@ function(input, output,session) {
   #outputs
   
   output$ScopeTree = renderUI({
-    data<- df_products_upload()
+    data<- df_products_upload()[['df1']]
     Scopes<- as.vector(unique(data$Scope))
     selectInput("ScopeTree", "Choose a Scope:",
                 choices = Scopes)
   })
   
   output$PeriodTree = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     data$Period<-as.numeric(data$Period)
     Periods<- as.vector(unique(data$Period))
     selectInput("PeriodTree", "Choose a Period:",
@@ -641,7 +648,7 @@ function(input, output,session) {
     if (input$act==0)
       return()
     #    isolate({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Level <-as.vector(unique(data$Level))
     datafilter<-filter(data,data$Scope == input$ScopeTree, data$Period == input$PeriodTree)
     tree<-datafilter%>%separate(Processor,c(Level), sep= "\\.")
@@ -655,7 +662,7 @@ function(input, output,session) {
   # TREE ----
   # REACTIVE INPUTS
   output$ScopeTree2 = renderUI({
-    data<- df_products_upload()
+    data<- df_products_upload()[['df1']]
     Scopes<- as.vector(unique(data$Scope))
     selectInput("ScopeTree2", "Choose a Scope:",
                 choices = Scopes)
@@ -663,7 +670,7 @@ function(input, output,session) {
   })
   
   output$PeriodTree2 = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     data$Period<-as.numeric(data$Period)
     Periods<- as.vector(unique(data$Period))
     selectInput("PeriodTree2", "Choose a Period:",
@@ -672,7 +679,7 @@ function(input, output,session) {
   })
   
   output$InterfaceTree2 = renderUI({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Interfaces<- as.vector(unique(data$Interface))
     selectInput("InterfaceTree2", "Choose an Interface:",
                 choices = Interfaces)
@@ -685,7 +692,7 @@ function(input, output,session) {
     if (input$act==0)
       return()
     #    isolate({
-    data<-df_products_upload()
+    data<-df_products_upload()[['df1']]
     Level <-as.vector(unique(data$Level))
     datafilter<-filter(data,data$Scope == input$ScopeTree2,data$Period == input$PeriodTree2, data$Interface == input$InterfaceTree2)
     tree<-datafilter%>%separate(Processor,c(Level), sep= "\\.")
@@ -707,7 +714,7 @@ function(input, output,session) {
   output$Unit <- renderText({
     if (input$act==0)
       return()
-    data<- df_products_upload()
+    data<- df_products_upload()[['df1']]
     Unit<- paste("Unit",filter(data,data$Interface == input$InterfaceTree2)$Unit[1],sep = "=")
     
   })  

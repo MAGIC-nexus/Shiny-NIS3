@@ -53,5 +53,5 @@ RUN install2.r --error --repos='http://cran.rstudio.com/' \
 
 ENV PATH /opt/conda/bin:$PATH
 ENV RETICULATE_PYTHON /opt/conda/bin/python3
-RUN pip install npm webdavclient
-RUN pip install --index-url https://test.pypi.org/simple/ nexinfosys-client==0.17
+RUN pip install npm webdavclient nexinfosys-client
+

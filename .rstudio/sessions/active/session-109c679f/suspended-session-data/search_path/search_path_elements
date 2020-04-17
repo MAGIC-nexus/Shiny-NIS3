@@ -1,6 +1,5 @@
 .GlobalEnv
 package:reticulate
-package:rhandsontable
 package:flexdashboard
 package:DT
 package:excelR

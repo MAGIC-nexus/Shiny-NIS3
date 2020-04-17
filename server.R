@@ -254,41 +254,8 @@ function(input, output,session) {
     
   })
   
-  
-  
-  
-  # #BarChart
-  #
-  # output$BarPlot <- renderPlot({
-  #
-  #   df<-filter(LE,LE$Scenario == input$scenario & LE$Period == input$period & LE$Processor == input$processor)
-  #   #remouving ".Input" ".Output" from interfaces
-  #   xx = c(names(df[-c(1,2,3,4)]))
-  #   x<-str_remove(xx,'.Output')
-  #   x<-str_remove(x,'.Input')
-  #   l<-x
-  #   names(l)<-x
-  #
-  #
-  #   if (input$log_10){
-  #     y = log10(abs(as.numeric(df[1,-c(1,2,3,4)])))*(abs(as.numeric(df[1,-c(1,2,3,4)]))/as.numeric(df[1,-c(1,2,3,4)]))
-  #   }
-  #   else{
-  #     y = as.numeric(df[1,-c(1,2,3,4)])
-  #   }
-  #
-  #   bar <-data.frame(x,y)
-  #   #ba   r<-filter(bar,bar$x %in% c(input$checkGroup))
-  #
-  #
-  #   # Fill in the spot we created for a plot
-  #
-  #   p = ggplot(bar, aes(x,y)) +
-  #     geom_bar(stat = "identity", aes(fill = x), legend = FALSE)
-  #   p+theme(axis.text.x = element_text(size = 10, angle = 90))
-  # })
-  
- 
+
+
   # create balance flow graph solution-----
   
   BalanceEUM<-reactive({
@@ -380,8 +347,6 @@ function(input, output,session) {
   ShortEUM<-reactive({
     eum<-totalEUM()
     eum<-filter(eum,System == input$SystemChoice, Scope == input$ScopeChoice  , Period == input$PeriodChoice)
-    # eum<-unique(eum)
-    # eum$ID <-seq.int(nrow(eum)) #TODO esto es una chanada, las filas no se deberían repetar
     eum<-eum[,!(colnames(eum) %in% c("indicator","Flow","Fund","Unit","System"))]%>%spread(indicator_Unit,value = Value)
   }) 
   
@@ -576,23 +541,28 @@ function(input, output,session) {
     ggplot(eum, aes(eum$input$ind1 , eum$input$ind2)) +
       geom_point(aes(colour =  factor( System), size = eum[input$ind3], alpha = Period))
   })
-
   
-  # EUM GAUGE ----
-  #Reactive input
+  #inputs
   output$indicator = renderUI({
-    eum <- eum()
-    ind <- colnames(eum[setdiff(names(eum), c("Processor","Interface_Unit","Value", "Level"))])
+    df <- totalEUM()
+    ind <- unique(df$indicator)
     selectInput("indicator", "Choose a indicator:",
                 choices = ind)
     
   })
+  
   output$LevelIndicator = renderUI({
-    eum<-eum()
-    Levels<-as.vector(unique(eum$Level))
+    df<-totalEUM()
+    Levels<-as.vector(unique(df$Level))
     selectInput("LevelIndicator", "Choose a level to analize:",
                 choices = Levels)
-    
+  })
+  
+  output$ScopeIndicator = renderUI({
+    df<-totalEUM()
+    Levels<-as.vector(unique(df$Scope))
+    selectInput("ScopeIndicator", "Choose a level to analize:",
+                choices = Levels)
   })
   
   
@@ -601,12 +571,25 @@ function(input, output,session) {
   output$gaugePlot <- renderPlot({
     if (input$act==0)
       return()
-    eum <- ShortEUM()
-    eumlevel<-filter(eum,eum$Level == input$LevelIndicator)
-    eumindicator<- eumlevel[c("Processor", input$indicator)]
-    gg.gauge(eumindicator,breaks = c(0,input$break2,input$break3,100))
+    eum <- totalEUM()
+    eumindicator<-filter(eum,eum$Level == input$LevelIndicator,indicator == input$indicator, eum$Scope == input$ScopeIndicator)
+    # eumindicator<- eumlevel[c("Processor", input$indicator)]
+    gg.gauge(eumindicator,breaks = c(input$break1,input$break2,input$break3,input$break4), colour = c(input$colour1,input$colour2,input$colour3))
     #TODO problem displaying text.. bad visualization of text...
   }, height = 400, width = 800 ) #this one seems to not change anything
+  
+  #Create command -----
+  
+  # Scalarbenchmark<- data.frame(
+  #  'benchMarkGroup' = as.character(),
+  #  'Stakeholders' = as.character(),
+  #  'Range' = as.character(),
+  #  'Category' = as.character(),
+  #  'Label' = as.character()
+  # )
+
+  
+  
   
   # TREE WITH QUANTITIES -----
   #outputs
@@ -627,18 +610,18 @@ function(input, output,session) {
   })
   
   
-  # EDITABLE EUM ----
-  output$editableTable<-renderRHandsontable({
-    df<-ShortEUM()
-    rhandsontable(df)
-    
-    
-  })
+  # # EDITABLE EUM ----
+  # output$editableTable<-renderRHandsontable({
+  #   df<-ShortEUM()
+  #   rhandsontable(df)
+  #   
+  #   
+  # })
   
   observeEvent(input$saveData,
                write.csv(hot_to_r(input$editableTable, file = MyData.csv, row.names = TRUE)))
   
-  #TODO ñla idea aquí es que al editar un indicador, como los fund se mantienen iguales, se edite una interface (o edito funds o edito flows, o mantengo la relación (lo que tenga sentido)
+  #TODO la idea aquí es que al editar un indicador, como los fund se mantienen iguales, se edite una interface (o edito funds o edito flows, o mantengo la relación (lo que tenga sentido)
   #editada la interface, puedo ver cómo cambian las el procesor al que me estoy refiriendo (solo ese prossor) lo que se traduciría en un cambio en todos los demás indicadores
   # VER SI ESTO LO PUEDO HACER CON LAS EXPRESIONES
   
@@ -719,8 +702,4 @@ function(input, output,session) {
     
   })  
   
-    # if (isClosed(session)) {
-    #   c$close_session()
-    #   c$logout()
-    # }
 } #END

@@ -5,17 +5,17 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "4099235127",
+    "hash" : "0",
     "id" : "972566B5",
-    "lastKnownWriteTime" : 1583153994,
-    "last_content_update" : 1583153994141,
+    "lastKnownWriteTime" : 1587109378,
+    "last_content_update" : 1587109378589,
     "path" : "~/ui.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "213,25",
-        "docOutlineSize" : "428",
+        "cursorPosition" : "192,40",
+        "docOutlineSize" : "382",
         "docOutlineVisible" : "1",
-        "scrollLine" : "209"
+        "scrollLine" : "176"
     },
     "read_only" : false,
     "read_only_alternatives" : [

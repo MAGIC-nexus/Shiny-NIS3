@@ -52,29 +52,29 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    
                    #end of Tab
                    
-                   # New tab with pie chart Systems-Interfaces -----
-                   ,tabPanel("Bar chart by System",
-                             sidebarLayout(
-                               sidebarPanel(
-                           
-                                 uiOutput("scenario2"),
-                             
-                                 uiOutput("scope2"),
-                             
-                                 uiOutput("period2"),
-                               
-                                 uiOutput("InterfacesChoice2"),
-                                 br(),
-                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each System. Scenario Scope and Period needs to be chosen aswell ")
-                                 
-                               ),
-                               mainPanel(
-                                 plotOutput("PiePlotSystem")
-                               )
-                             )
-                   )
-                   
-                   #end of Tab
+                   # # New tab with pie chart Systems-Interfaces -----
+                   # ,tabPanel("Bar chart by System",
+                   #           sidebarLayout(
+                   #             sidebarPanel(
+                   #         
+                   #               uiOutput("scenario2"),
+                   #           
+                   #               uiOutput("scope2"),
+                   #           
+                   #               uiOutput("period2"),
+                   #             
+                   #               uiOutput("InterfacesChoice2"),
+                   #               br(),
+                   #               p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each System. Scenario Scope and Period needs to be chosen aswell ")
+                   #               
+                   #             ),
+                   #             mainPanel(
+                   #               plotOutput("PiePlotSystem")
+                   #             )
+                   #           )
+                   # )
+                   # 
+                   # #end of Tab
                    
                    #New tab with pie chart  Processots-Interfaces -----
                    ,tabPanel("Bar Chart by Processors",
@@ -169,7 +169,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    
                    
                    
-                   # New tab with indicators plot -----
+                   # New tab with gauge plot -----
                    
                    #TODO use fluid row https://shiny.rstudio.com/gallery/basic-datatable.html
                    ,tabPanel("INDICATORS",
@@ -184,9 +184,11 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  uiOutput("LevelIndicator")),
                                  
                                  column(4,style=list("padding-right: 3px;"),
-                                 uiOutput("ScopeIndicator"))
-                                 ),
+                                 uiOutput("ScopeIndicator")),
                                  
+                                 column(4,style=list("padding-right: 3px;"),
+                                        uiOutput("PeriodIndicator"))
+                                ),
                                  selectInput("BechmarkGroup","Bechmark Group", choices = c("Feasibility", "Viability", "Desirability",""), selected = ""),
                                  
                                  h3("Zone 1"),

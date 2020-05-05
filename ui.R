@@ -189,7 +189,16 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  column(4,style=list("padding-right: 3px;"),
                                         uiOutput("PeriodIndicator"))
                                 ),
-                                 selectInput("BechmarkGroup","Bechmark Group", choices = c("Feasibility", "Viability", "Desirability",""), selected = ""),
+                                
+                                fluidRow(
+                                  column(4,style=list("padding-right: 3px;"),
+                                         textInput("IndName", "Ind Name",placeholder = "Ind Name")),
+                                  column(4,style=list("padding-right: 3px;"),
+                                         selectInput("BechmarkGroup","Bechmark Group", choices = c("Feasibility", "Viability", "Desirability",""), selected = "")),
+                                  column(4,style=list("padding-right: 3px;"),
+                                         textInput("Description", "Description",placeholder = "Short description"))
+                                  
+                                  ),
                                  
                                  h3("Zone 1"),
                                  #ZONE 1
@@ -202,49 +211,55 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  
                                  column(3,style=list("padding-right: 3px;"),
                                  numericInput("break1", "Min", 0)),
-
-                                 column(3,style=list("padding-right: 3px;"),
-                                        selectInput("Include1", "limit",choices = c(")","]"),selected = "(")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
-                                 numericInput("break2", "break 2", 0.1))
+                                 numericInput("break2", "break 2", 0.1)),
+                                 
+                                 column(3,style=list("padding-right: 3px;"),
+                                        selectInput("Include1", "",choices = c(")","]"),selected = "("))
                                  ),
                                  
                                  br(),
                                  h3("Zone  2"),
                                  fluidRow(
                                   column(6,style=list("padding-right: 3px;"),
-                                 textInput("ZoneName1", "Category",placeholder = "Medium")),
+                                 textInput("ZoneName2", "Category",placeholder = "Medium")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
                                  selectInput("colour2","colour", choices = c( "red","gold","forestgreen"),selected = "gold")), 
+                                 
+                                 column(3,style=list("padding-right: 3px;"),
+                                        selectInput("Include2","",choices = c("(","["),selected = "(")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
                                  numericInput("break3", "break3", 2)),
                                 
                                  
-                                 column(6,style=list("padding-right: 3px;"),
-                                        selectInput("Include2","limit ",choices = c(")","]"),selected = "]"))
+                                 column(3,style=list("padding-right: 3px;"),
+                                        selectInput("Include3","",choices = c(")","]"),selected = "]"))
                                  ),
                                  
                                  p(), #TODO arreglar línea
                                  h3("Zone  3"),
                                  fluidRow(
                                   column(6,style=list("padding-right: 3px;"),
-                                 textInput("ZoneName1", "Category",placeholder = "Max")),
+                                 textInput("ZoneName3", "Category",placeholder = "Max")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
                                  selectInput("colour3","colour", choices = c( "red","gold","forestgreen"),selected = "forestgreen")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
-                                 numericInput("break4", "Max", 2.5)),
+                                        selectInput("Include4", "",choices = c("(","["),selected = "(")),
                                  
                                  column(6,style=list("padding-right: 3px;"),
-                                        selectInput("Include3", "limit",choices = c(")","]"),selected = "]")),
-                               )),
-
-                             
-                             
+                                 numericInput("break4", "Max", 2.5))
+                               ),
+                               
+                               downloadButton("dl", "Download"),
+                               actionButton("addCommands", "An action button")
+                               
+                               ),
+                               
                                mainPanel(
                                  plotOutput("gaugePlot", width = "100%")
                                )

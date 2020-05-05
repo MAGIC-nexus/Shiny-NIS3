@@ -53,7 +53,7 @@ function(input, output,session) {
     }else{
       df<-issues
     }
-      list(df1 = df, df2 = issues)
+      list(df1 = df, df2 = issues,  c= c)
 
   })
   
@@ -96,14 +96,12 @@ function(input, output,session) {
   # INPUTS: 
   
   output$scenario = renderUI({
-    # datos<-df_products_upload()[['df1']]
     datos<-dfIO()
     Scenarios <- as.vector(unique(datos$Scenario))
     selectInput('scenario', "Choose a Scenario:", Scenarios)
   })
   
   output$scope = renderUI({
-    # datos<-df_products_upload()[['df1']]
     datos<-dfIO()
     Scopes<- as.vector(unique(datos$Scope))
     selectInput('scope', "Choose a Scope:", Scopes)
@@ -111,7 +109,6 @@ function(input, output,session) {
   
   
   output$period = renderUI({
-    # datos<-df_products_upload()[['df1']]
     datos<-dfIO()
     datos$Period<-as.numeric(datos$Period)
     Periods<- as.vector(unique(datos$Period))
@@ -120,7 +117,6 @@ function(input, output,session) {
   
   
   output$level = renderUI({
-    # datos<-df_products_upload()[['df1']]
     datos<-dfIO()
     Level <-as.vector(unique(datos$Level))
     selectInput('level', "Choose a level:", Level)
@@ -128,7 +124,6 @@ function(input, output,session) {
   
   
   output$InterfacesChoice1 = renderUI({
-    # datos<-df_products_upload()[['df1']]
     datos<-dfIO()
     Interfaces<- as.vector(unique(datos$Interface))
     checkboxGroupInput("InterfacesChoice1", "InterfacesTypes:",
@@ -146,9 +141,7 @@ function(input, output,session) {
     
     #TODO  % Value
     # TODO nombre de los processors en vertical
-    # datos<-df_products_upload()[['df1']]
     data<-dfIO()
-    # df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope == input$scope)
     df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope != 'Total')
     df <- filter(df, Interface %in% input$InterfacesChoice1, )
     
@@ -617,9 +610,8 @@ function(input, output,session) {
   
   output$ScopeIndicator = renderUI({
     df<-totalEUM()
-    Levels<-as.vector(unique(df$Scope))
     selectInput("ScopeIndicator", "Choose Scope:",
-                choices = Levels)
+                choices = c("Local","External"))
   })
   
   
@@ -645,15 +637,64 @@ function(input, output,session) {
   
   #Create command -----
   
+  
   # Scalarbenchmark<- data.frame(
-  #  'benchMarkGroup' = as.character(),
-  #  'Stakeholders' = as.character(),
-  #  'Range' = as.character(),
-  #  'Category' = as.character(),
-  #  'Label' = as.character()
+  #   'benchMarkGroup' = as.character(),
+  #   'Stakeholders' = as.character(),
+  #   'Range' = as.character(),
+  #   'Category' = as.character(),
+  #   'Label' = as.character()
   # )
+  # 
 
   
+  ScalarBenchmarks<-reactive({
+    data.frame(
+      'benchMarkGroup' = rep(input$BechmarkGroup,3),
+      'Stakeholders' = rep('',3),
+      'Range' = c(paste0("[",input$break1,',',input$break2,input$Include1),
+                  paste0(input$Include2,input$break2,',',input$break3,input$Include3),
+                  paste0(input$Include4,input$break3,',',input$break4,']')
+                  ),
+      'Category' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3),
+      'Label' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3)
+    )  
+    
+  })
+  
+  ScalarIndicators<-reactive({
+    if ( input$ScopeIndicator == 'Local'){
+      Local = 'Yes'
+    }
+    else{
+      Local = "No"
+    }
+    data.frame(
+      'Indicator' = input$IndName,
+      'Local'= Local,
+      'Formula' = input$indicator,
+      'Banchmark' = 'b1',
+      'Description' = input$Description
+    # TODO crear un contador para que vaya agregando los bechmakr
+    )
+  })
+ 
+  # Add command   
+  observeEvent(input$addCommands,{
+    c = df_products_upload()[['c']]
+    c$check_backend_available()
+    c$append_command('ScalarIndicators',ScalarIndicators())
+    c$append_command('ScalarBenchmarks',ScalarBenchmarks())
+  # TODO ir haciendo el append
+    })
+  
+  # download Commands xlsx
+ 
+  output$dl <- downloadHandler(
+    filename = function() {"Indicators.xlsx"},
+    content = function(file) {write_xlsx(list(ScalarIndicators =ScalarIndicators(), ScalarBenchmarks = ScalarBenchmarks()), path = file)}
+    )
+   
   
   
   # TREE WITH QUANTITIES -----

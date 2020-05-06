@@ -257,7 +257,6 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                
                                downloadButton("dl", "Download"),
                                actionButton("addCommands", "An action button")
-                               
                                ),
                                
                                mainPanel(

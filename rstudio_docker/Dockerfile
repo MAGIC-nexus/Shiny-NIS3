@@ -41,7 +41,7 @@ RUN install2.r --error --repos='http://cran.rstudio.com/' \
     reticulate \
     flexdashboard \
     excelR \
-    DT
+    DT	
 
 RUN apt-get -y install zlib1g-dev
 
@@ -49,7 +49,8 @@ RUN install2.r --error --repos='http://cran.rstudio.com/' \
     data.table \
     stringr \
     collapsibleTree \
-    rlist
+    rlist \
+    writexl
 
 ENV PATH /opt/conda/bin:$PATH
 ENV RETICULATE_PYTHON /opt/conda/bin/python3

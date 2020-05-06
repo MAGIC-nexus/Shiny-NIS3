@@ -18,6 +18,7 @@ function(input, output,session) {
       return(NULL)
     filename <- inFile$datapath
     c <- nexinfosys$NISClient("https://one.nis.magic-nexus.eu/nis_api")
+    # c <- nexinfosys$NISClient("http://0.0.0.0:5000/nis_api")
     fname <- filename
     try({print(c$close_session())
          print(c$logout())
@@ -319,8 +320,8 @@ function(input, output,session) {
   # new Reactive EUM (all indicators in the same column) ----
   
   totalEUM<-reactive({
-    data<-df_products_upload()[['df1']]
-    # data <- BalanceEUM()
+    # data<-df_products_upload()[['df1']]
+    data<-dfAbs()
     df<-filter(data, data$Scenario == input$ScenarioChoice)
     eum <- filter(df, Interface %in% input$show_Interfaces,)
     funds <- input$FundInterface
@@ -339,7 +340,7 @@ function(input, output,session) {
                          'System' = as.character(),
                          'Scope' = as.character(),
                          'Period' = as.numeric(),
-                         'Orientation' = as.character(),
+                         # 'Orientation' = as.character(),
                          stringsAsFactors = FALSE)
       if (length(funds!=0)){
         for (i in funds){
@@ -357,7 +358,7 @@ function(input, output,session) {
             'System' = eum$System,
             'Scope' = eum$Scope,
             'Period' = eum$Period,
-            'Orientation' = eum$Orientation,
+            # 'Orientation' = eum$Orientation,
             stringsAsFactors = FALSE
           )
           eumTotal<-rbind(eumTotal,eumTmp,stringsAsFactors = FALSE)
@@ -378,7 +379,7 @@ function(input, output,session) {
           'System' = eum$System,
           'Scope' = eum$Scope,
           'Period' = eum$Period,
-          'Orientation' = eum$Orientation,
+          # 'Orientation' = eum$Orientation,
           stringsAsFactors = FALSE
         )
         eumTotal<-rbind(eumTotal,eumTmp,stringsAsFactors = FALSE)
@@ -611,7 +612,7 @@ function(input, output,session) {
   output$ScopeIndicator = renderUI({
     df<-totalEUM()
     selectInput("ScopeIndicator", "Choose Scope:",
-                choices = c("Local","External"))
+                choices = c("Internal","External"))
   })
   
   
@@ -647,6 +648,11 @@ function(input, output,session) {
   # )
   # 
 
+  createBenchmark<-function(input){
+ 
+  }
+  
+  
   
   ScalarBenchmarks<-reactive({
     data.frame(
@@ -654,13 +660,31 @@ function(input, output,session) {
       'Stakeholders' = rep('',3),
       'Range' = c(paste0("[",input$break1,',',input$break2,input$Include1),
                   paste0(input$Include2,input$break2,',',input$break3,input$Include3),
-                  paste0(input$Include4,input$break3,',',input$break4,']')
-                  ),
+                  paste0(input$Include4,input$break3,',',input$break4,']')),
       'Category' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3),
       'Label' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3)
-    )  
+    )    
     
   })
+  
+
+  
+  # ScalarBenchmarks <-observeEvent(input$append,{
+  #   if (input$append ==1){
+  #     ScalarBenchmarksInput()
+  #   }
+  #     if (input$append>1){
+  #     rbind(ScalarBenchmarksInput(), ScalarBenchmarksOld())
+  #     }
+  #   })
+  # 
+  #  
+  # ScalarBenchmarksOld<-reactive({
+  #     ScalarBenchmarks() 
+  # })
+  
+  
+  
   
   ScalarIndicators<-reactive({
     if ( input$ScopeIndicator == 'Local'){
@@ -678,6 +702,10 @@ function(input, output,session) {
     # TODO crear un contador para que vaya agregando los bechmakr
     )
   })
+  
+  
+  
+
  
   # Add command   
   observeEvent(input$addCommands,{

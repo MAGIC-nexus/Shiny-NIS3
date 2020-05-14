@@ -1,5 +1,4 @@
-# Define UI for application that draws a histogram
-#ui<-# table view of the generated dist ribution
+
 shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    
                    # New tab with file input and table display -----
@@ -11,9 +10,9 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                           ),
                                 actionButton("act","click to update dataset input"),
                                 #TODO controlar que estos mensajes salgan antes de que salga la tabla
-                                textOutput("num_errors"),
-                                textOutput("opened"),
-                                textOutput("worksheets")
+                                # textOutput("num_errors"),
+                                # textOutput("opened"),
+                                # textOutput("worksheets")
                               ),
                               mainPanel(
                                 tabsetPanel(
@@ -25,78 +24,71 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                             )
                    )
                    #end of Tab
-                
-                   # New tab with pie chart Levels-Interfaces ----
+                   ,tabPanel("Bar chart by level Multi Interface",
+                             sidebarLayout(
+                               sidebarPanel(
+                                 barPlotChoicesUI(id = 'first'),
+                                 br(),
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                               ),
+                               mainPanel(
+                                 barPlotUI(id = 'first',stringName = 'barPlot')
+                               )
+                             )
+                   )
+                   ,tabPanel("Bar chart by level Multi Interface Scope study ",
+                             sidebarLayout(
+                               sidebarPanel(
+                                 barPlotChoicesUI(id = 'Scope'),
+                                 br(),
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                               ),
+                               mainPanel(
+                                 barPlotUI(id = 'Scope',stringName = 'barPlot')
+                               )
+                             )
+                   )
                    ,tabPanel("Bar chart by level",
                              sidebarLayout(
                                sidebarPanel(
-                               
-                                 uiOutput('scenario'),
-                           
-                                 uiOutput('scope'),
-                          
-                                 uiOutput('period'),
-                            
-                                 uiOutput('level'),
-                            
-                                 uiOutput("InterfacesChoice1"),
+                                 barPlotChoicesUI(id = 'System'),
                                  br(),
                                  p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
-                                 
                                ),
                                mainPanel(
-                                 plotOutput("PiePlot")
+                                 barPlotUI(id = 'System',stringName = 'barPlot')
                                )
                              )
                    )
-                   
-                   #end of Tab
-                   
-                   # # New tab with pie chart Systems-Interfaces -----
-                   # ,tabPanel("Bar chart by System",
-                   #           sidebarLayout(
-                   #             sidebarPanel(
-                   #         
-                   #               uiOutput("scenario2"),
-                   #           
-                   #               uiOutput("scope2"),
-                   #           
-                   #               uiOutput("period2"),
-                   #             
-                   #               uiOutput("InterfacesChoice2"),
-                   #               br(),
-                   #               p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each System. Scenario Scope and Period needs to be chosen aswell ")
-                   #               
-                   #             ),
-                   #             mainPanel(
-                   #               plotOutput("PiePlotSystem")
-                   #             )
-                   #           )
-                   # )
-                   # 
-                   # #end of Tab
-                   
-                   #New tab with pie chart  Processots-Interfaces -----
-                   ,tabPanel("Bar Chart by Processors",
+                   ,tabPanel("Bar chart subsystem study",
                              sidebarLayout(
                                sidebarPanel(
-                                 p("This plot shows the contribution of the selected interfaces ( eg: water, LU..etc) comparing a group of processor shoosen by the user. Scenario Scope and Period needs to be chosen aswell "),
-                        
-                                 uiOutput("scenario3"),
-                                 uiOutput("scope3"),
-                                 uiOutput("period3"),
-                                 uiOutput("InterfacesChoice3"),
-                                 uiOutput("ProcessorsChoice")
-                                 
-                                 
+                                 barPlotChoicesUI(id = 'System'),
+                                 br(),
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
                                ),
                                mainPanel(
-                                 plotOutput("PiePlotProcessors")
+                                 barPlotUI(id = 'System',stringName = 'barPlot')
+                               )
+                             )
+                   )
+                   #New tab with pie chart  Processots-Interfaces -----
+                   ,tabPanel("Bar chart free choice processorl",
+                             sidebarLayout(
+                               sidebarPanel(
+                                 barPlotChoicesUI(id = 'processor'),
+                                 br(),
+                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                               ),
+                               mainPanel(
+                                 barPlotUI(id = 'processor',stringName = 'processor')
                                )
                              )
                    )
                    
-                   # end of Tab
+                   
+                   
+                   #end of Tab
                    
   
                    
@@ -265,25 +257,6 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                              )
                    )#end
                    
-                   
-                   #New tab with editable EUM (working but missing implementation)------
-                   
-                   # ,tabPanel("Editable Indicators",
-                   #           sidebarLayout(
-                   #             sidebarPanel(
-                   #               actionButton("saveData","Save")
-                   #             ),
-                   #             
-                   #             mainPanel(
-                   #               rHandsontableOutput("editableTable")
-                   #             )
-                   #           )
-                   # ) #end 
-
-                   
-                   
-                   
-                   
                    # box plot (no in use) ----
                    # ,tabPanel("boxplot",
                    #           sidebarLayout(
@@ -315,26 +288,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                    # )
                    
                    
-                   
-                   # New tab tree (Working but Interface Tree already in use) ----
-                   # ,tabPanel("Tree",
-                   #           sidebarLayout(
-                   #             sidebarPanel(
-                   #               # selectInput("Scope2", "Choose a Scope:",
-                   #               #             choices = Scopes),
-                   #               # selectInput("Period2", "Choose a Period:",
-                   #               #             choices = Periods)
-                   #               uiOutput("ScopeTree"),
-                   #               uiOutput("PeriodTree"),
-                   #               br(),
-                   #               p("this tree plot shows processor hierarchy")
-                   #             ),
-                   #             
-                   #             mainPanel(
-                   #               collapsibleTreeOutput("Tree")
-                   #             )
-                   #           )
-                   # ) #end tab
+              
                    
                    
                    # New tab tree with quantities ----
@@ -362,4 +316,7 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                              )
                    ) #end tab                   
                                       
-))#VERY END
+  )
+
+
+)#VERY END

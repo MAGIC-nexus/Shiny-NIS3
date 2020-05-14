@@ -8,63 +8,26 @@ function(input, output,session) {
     print(c$logout())
     stopApp()
   })
-  
-  
-  
+
   # INPUT FILE TO NIS ----  
-  df_products_upload <- reactive({
-    inFile <- input$target_upload
-    if (is.null(inFile))
-      return(NULL)
-    filename <- inFile$datapath
-    c <- nexinfosys$NISClient("https://one.nis.magic-nexus.eu/nis_api")
-    # c <- nexinfosys$NISClient("http://0.0.0.0:5000/nis_api")
-    fname <- filename
-    try({print(c$close_session())
-         print(c$logout())
-    }, silent = FALSE)
 
-    print(c$login("test_user"))
-    # output$logged<-renderText({"Logged in"})
-    c$open_session()
-    # output$opened<-renderText({"Session opened"})
-    n <- c$load_workbook(fname, "NIS_agent", "NIS_agent@1")
-    output$worksheets<-renderText({paste("N worksheets: ",n)})
-    r <- c$submit()
-    num_errors<- 0
-    if (length(r) > 0){
-      issues <- data.frame(matrix(unlist(r), nrow=length(r), byrow=T, ncol = 5))
-      colnames(issues)<-c("sheet","message","row","sheet_name","type")
-      for(i in r){
-        if (i["type"] == 3){
-          num_errors <-num_errors + 1
-        }
-      }
-      output$num_errors<-renderText({toString(num_errors)})
-    }
-    print("Returned from submit")
-    if (num_errors == 0){
-      r <- c$query_available_datasets()
-      ds <- c$query_datasets(c(tuple("flow_graph_solution", "csv", "dataframe")))
-      df <- py_to_r(ds[[1]][[3]])
-      #TODO quitar esto y poner todos los resultados
-      #TODO tendré que cambiar más código
-      # df<-subset(df,select = -c(Conflict_Partof,Conflict_Itype,Computed,Expression,Observer))
-      df$Value<-as.numeric(lapply(df$Value,str_replace ,pattern = ",",replacement = "."))
-    }else{
-      df<-issues
-    }
-      list(df1 = df, df2 = issues,  c= c)
-
-  })
   
+  #INPUT FGS XLSX ----
+  df_products_upload<- reactive({
+    df <- pandas$read_csv('flow_graph_solution_multi_system.csv')
+    df$Period<-as.character(df$Period)
+    list(df1 = df, df2 = df)
+  })
+
   output$sample_table<- renderDataTable({
     df <- df_products_upload()[['df1']]
+    browser()
     DT::datatable(df)
   })
-  
+
   output$issues<- renderDataTable({
     df <- df_products_upload()[['df2']]
+    df$Period<-as.numeric(df$Period)
     DT::datatable(df)
   })
   
@@ -72,9 +35,17 @@ function(input, output,session) {
   # Reactive FGS Absolute values ------
   dfAbs<-reactive({
     df<-df_products_upload()[['df1']]
-    # df<-df %>% replace_na(list(Level = 'Subsystem')) #n
-    df[is.na(df)] <- ""
-    df<- filter(df, Conflict_Partof != 'Dissmissed', Conflict_Itype != 'Dissmissed')
+    
+    #Cleaing
+    df<-df %>% replace_na(list(Level = 'Subsystem'))
+    df[is.na(df)] <- "Subsystem"
+    
+    
+    # Select oly useful data for analysis
+    df<- filter(df, Conflict_Partof != 'Dismissed', Conflict_Itype != 'Dismissed')
+    cols<- c('Scenario','Period','Scope','Processor','Interface','Orientation','RoegenType','Value','Unit','Level','System','Subsystem','Sphere')
+    df<-subset(df,select = cols)
+    
     #Spreading Value by orientation
     data_spread<-df%>%spread(Orientation,value = Value)
     data_spread<-data_spread %>% replace_na(list(Input = 0, Output = 0))
@@ -91,236 +62,47 @@ function(input, output,session) {
     })
   
   
+ 
+
+ 
   
   
-  # BAR CHART PLOT BY LEVEL -------
-  # INPUTS: 
+  # BAR PLOT Scope choice grouped   ---------------------
   
-  output$scenario = renderUI({
-    datos<-dfIO()
-    Scenarios <- as.vector(unique(datos$Scenario))
-    selectInput('scenario', "Choose a Scenario:", Scenarios)
-  })
+  callModule(barPlotChoices, "first", dfIO)
+  callModule(barPlotChoicesScope,"first",dfIO)
+  callModule(barPlotChoicesMultiInterface,'first',dfIO)
+  callModule(MultibarPlotServer,"first",dfIO)
   
-  output$scope = renderUI({
-    datos<-dfIO()
-    Scopes<- as.vector(unique(datos$Scope))
-    selectInput('scope', "Choose a Scope:", Scopes)
-  })
+  # BAR PLOT SCOPES stacked  Interface grouped  ---------------------
+  #TODO leyend
+  # Interface grouped
+  callModule(barPlotChoices, "Scope", dfIO)
+  callModule(barPlotChoicesMultiInterface,'Scope',dfIO)
+  callModule(MultibarPlotServerScope,"Scope",dfIO)
   
+  #  BAR CHART BY SYSTEM stacked subsystems  ----
   
-  output$period = renderUI({
-    datos<-dfIO()
-    datos$Period<-as.numeric(datos$Period)
-    Periods<- as.vector(unique(datos$Period))
-    selectInput('period',  "Choose a Period:", Periods, selected = 2017)
-  })
-  
-  
-  output$level = renderUI({
-    datos<-dfIO()
-    Level <-as.vector(unique(datos$Level))
-    selectInput('level', "Choose a level:", Level)
-  })
-  
-  
-  output$InterfacesChoice1 = renderUI({
-    datos<-dfIO()
-    Interfaces<- as.vector(unique(datos$Interface))
-    checkboxGroupInput("InterfacesChoice1", "InterfacesTypes:",
-                       choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
-  })
-  
-  
-  
-  
-  # Plot by Level-----
-  
-  output$PiePlot <- renderPlot({
-    if (input$act==0)
-      return()
-    
-    #TODO  % Value
-    # TODO nombre de los processors en vertical
-    data<-dfIO()
-    df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope != 'Total')
-    df <- filter(df, Interface %in% input$InterfacesChoice1, )
-    
-    df$per<-round(df$Value/sum(df$Value)*100, digits = 3)
-    df$names_per <-paste(df$Processor,df$per,"%", sep = " ")
-    UnitList<- unique(df$Unit)
-    
-    validate(
-      need(length(UnitList)==1, "Your interface selection should have the same unit") 
-    )
-    # barchart <- ggplot (df, aes( x = Processor ,  y = Value, fill = Interface)) 
-    
-    dfInt = df[which(df$Scope == 'Internal'),]
-    names(dfInt)[names(dfInt)=='Interface']<-'Interface_Internal'
-    dfExt = df[which(df$Scope == 'External'),]
-    names(dfExt)[names(dfExt)=='Interface']<-'Interface_External'
-    
-    
-    # TODO no consigo que salga la leyenda de external...... 
-    # código https://stackoverflow.com/questions/38070878/r-stacked-grouped-barplot-with-different-fill-in-r
-    barchart<-ggplot() +
-    geom_bar(data = dfInt, aes( x = Processor ,  y = Value, fill = Interface_Internal), position="dodge", stat = "identity", show.legend = TRUE) +
-      theme(legend.position = 'botton')+
-    geom_bar(data = dfExt, aes( x = Processor ,  y = Value, fill = Interface_External), position="dodge", stat = "identity",alpha=0.5, show.legend = TRUE, inherit.aes = TRUE) +
-    theme(legend.position = 'top')+
-    labs(title = "Inrterface value", y = unique(df$Unit)) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
-    
-    
-    barchart
-  })
-  
-  
-  # 
-  # Output$IOBarChart<- renderPlot({
-  #   
-  #   
-  #   })
-  # 
-  
-  
-  #  BAR CHART BY SYSTEM  ----
-  # Reactive Inputs
-  
-  # output$scenario2 = renderUI({
-  #   datos<-df_products_upload()[['df1']]
-  #   Scenarios <- as.vector(unique(datos$Scenario))
-  #   selectInput('scenario2', "Choose a Scenario:", Scenarios)
-  # })
-  # 
-  # output$scope2 = renderUI({
-  #   datos<-df_products_upload()[['df1']]
-  #   Scopes<<- as.vector(unique(datos$Scope))
-  #   selectInput('scope2', "Choose a Scope:", Scopes)
-  # })
-  # 
-  # 
-  # output$period2 = renderUI({
-  #   datos<-df_products_upload()[['df1']]
-  #   datos$Period<-as.numeric(datos$Period)
-  #   Periods<- as.vector(unique(datos$Period))
-  #   selectInput('period2',  "Choose a Period:", Periods)
-  # })
-  # 
-  # 
-  # 
-  # output$InterfacesChoice2 = renderUI({
-  #   datos<-df_products_upload()[['df1']]
-  #   Interfaces<- as.vector(unique(datos$Interface))
-  #   checkboxGroupInput("InterfacesChoice2", "InterfacesTypes:",
-  #                      choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
-  # })
-  # 
-  # 
-  # 
-  # #plot by System----
-  # #TODO en realidad creo que este gráfico no tiene mucho sentido... 
-  # #TODO 
-  # output$PiePlotSystem <- renderPlot({
-  #   if (input$act==0)
-  #     return()
-  #   #TODO  % Values 
-  #   data<-df_products_upload()[['df1']]
-  #   df <- filter(data,data$Scenario == input$scenario2 & data$Period == input$period2 , data$Scope == input$scope2)
-  #   df <- filter(df, Interface %in% input$InterfacesChoice2, )
-  #   UnitList<- unique(df$Unit)
-  #   validate(
-  #     need(length(UnitList)==1, "Your interface selection should have the same unit") 
-  #   )
-  #   barchart <- ggplot (df, aes( x = System ,  y = Value, fill = Interface)) + geom_bar( position="dodge", stat = "identity") + 
-  #     labs(title = "Inrterface value", y = unique(df$Unit)) +
-  #     theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  #   barchart
-  # })
+  callModule(ScenarioTimeChoice,'System',dfAbs)
+  callModule(barPlotChoicesInterface,'System',dfAbs)
+  callModule(barPlotSubsystemServer,'System',dfAbs)
   
   
   
   # BAR CHART BY PROCESSOR ------
   # Reactive Inputs:
-  
-  output$scenario3 = renderUI({
-    datos<-df_products_upload()[['df1']]
-    Scenarios <- as.vector(unique(datos$Scenario))
-    selectInput('scenario3', "Choose a Scenario:", Scenarios)
-  })
-  
-  output$scope3 = renderUI({
-    datos<-df_products_upload()[['df1']]
-    Scopes<- as.vector(unique(datos$Scope))
-    selectInput('scope3', "Choose a Scope:", Scopes)
-  })
-  
-  output$period3 = renderUI({
-    datos<-df_products_upload()[['df1']]
-    datos$Period<-as.numeric(datos$Period)
-    Periods<- as.vector(unique(datos$Period))
-    selectInput('period3',  "Choose a Period:", Periods)
-  })
-  
-  
-  output$ProcessorsChoice = renderUI({
-    datos<-df_products_upload()[['df1']]
-    Processors<- as.vector(unique(datos$Processor))
-    checkboxGroupInput("ProcessorsChoice", "Processors to compare:",
-                       choiceNames = Processors, choiceValues = Processors, selected = Processors[1])
-  })
-  
-  output$InterfacesChoice3 = renderUI({
-    datos<-df_products_upload()[['df1']]
-    Interfaces<- as.vector(unique(datos$Interface))
-    checkboxGroupInput("InterfacesChoice3", "InterfacesTypes:",
-                       choiceNames = Interfaces, choiceValues = Interfaces, selected = Interfaces[1])
-  })
-  
-  #Plot by Processors------
-  output$PiePlotProcessors <- renderPlot({
-    if (input$act==0)
-      return()
-    data<-df_products_upload()[['df1']] 
-    df <- filter(data,data$Scenario == input$scenario3 &  data$Period == input$period3, data$Scope == input$scope3)
-    df <- filter(df, Processor %in% input$ProcessorsChoice, )
-    df <- filter(df, Interface %in% input$InterfacesChoice3, )
-    df$per<-round(df$Value/sum(df$Value)*100, digits = 3)
-    df$names_per <-paste(df$Processor,df$per,"%", sep = " ")
-    # plt <- ggplot (df, aes( x = "" ,  y = Value, fill = names_per)) + geom_bar(width = 1, stat = "identity")
-    # pie <- plt + coord_polar("y", start=0)
-    # pie
-    # TODO try to represents levels aswell better only allow to reppresent interfaces with same units
-    UnitList<- unique(df$Unit)
-    validate(
-      need(length(UnitList)==1, "Your interface selection should have the same unit") 
-    )
-    
-    
-    barchart <- ggplot (df, aes( x = Processor ,  y = Value, fill = Interface)) + geom_bar( position="dodge", stat = "identity") + 
-      labs(title = "Inrterface value", y = unique(df$Unit)) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    barchart
-    
-  })
+  callModule(ScenarioTimeChoice, "processor", dfIO)
+  callModule(barPlotChoicesScope,"processor",dfIO)
+  callModule(barPlotChoicesMultiInterface,'processor',dfIO)
+  callModule(barPlotChoicesMultiProcessor,'processor',dfIO)
+  callModule(barPlotProcessorInterfaceSertver,'Processor',dfIO)
   
 
-
-  # create balance flow graph solution-----
-  
-  BalanceEUM<-reactive({
-    data<-df_products_upload()[['df1']]
-    data_spread<-data%>%spread(Orientation,value = Value)
-    data_spread$balance <- (flow_balanace$Input - flow_balanace$Output)
-    data_gather<-data_gather%>%gather(key = c("Orientation", "Value"), value = c("Input","Output","balance"))
-  })
   
   
   # new Reactive EUM (all indicators in the same column) ----
   
   totalEUM<-reactive({
-    # data<-df_products_upload()[['df1']]
     data<-dfAbs()
     df<-filter(data, data$Scenario == input$ScenarioChoice)
     eum <- filter(df, Interface %in% input$show_Interfaces,)
@@ -452,16 +234,7 @@ function(input, output,session) {
   })
   
   
-  # tabla EUM SIN FORMATO EXCEL (NO EN USO)
-  # output$eum<- DT::renderDataTable({
-  #   if (input$act==0)
-  #     return()
-  
-  #renderTable({
-  # eum()
-  #    })
-  
-  # })
+
   
   
   
@@ -472,53 +245,9 @@ function(input, output,session) {
       return()
     excelTable(data = ShortEUM())
   })
+
   
-    # rpivotTable(data = eum()   ,  rows = "Processor",cols="Level",
-    # vals = "Value", aggregatorName = "Sum", rendererName = "Table",
-    # width="100%", height="500px")
-  # })
-  
-  
-  #BOXPLOTS NO EN USO ---- 
-  
-  # output$boxplot <- renderPlot({
-  #   # #renderTable({
-  #   # df<-filter(data,data$Scope == input$ScopeChoice, data$Scenario == input$ScenarioChoice , data$Period == input$PeriodChoice, data$System == input$SystemChoice)
-  #   # if (length(df$Conflict) != 0){
-  #   #   df<-filter(df, df$Conflict != "Dismissed")
-  #   # }
-  #   # eumflow <- filter(df, Interface %in% input$show_Interfaces, )
-  #   # eumfund <- filter(df, df$Interftace == input$FundInterface)
-  #   #
-  #   # eum <- merge(x = eumflow,y = eumfund, by = "Processor")
-  #   # eum$Valueeum <- eum$Value.x/eum$Value.y
-  #   # eum$Valuepop<-eum$Value.x/input$Population
-  #   #
-  #   # eum$InterfaceUnit<-paste(paste(eum$Interface.x,eum$Interface.y,sep = "/"),paste(eum$Unit.x,eum$Unit.y,sep = "/"),sep=" ")
-  #   # eumInterface <- eum%>%select(Level.x,Processor, Valueeum,InterfaceUnit)%>% spread(InterfaceUnit,Valueeum)
-  #   # eumInterface<-`colnames<-`(eumInterface,c("Level", colnames(eumInterface[-1])))
-  #   #
-  #   #
-  #   #
-  #   # eumpop<-eum%>%select(Processor, Valuepop, Interface.x)%>% spread(Interface.x,Valuepop)
-  #   # colnamesEumpop<-paste(colnames(eumpop)[-1], "cap", sep = "/")
-  #   # eumpop<-`colnames<-`(eumpop,c("Processor",colnamesEumpop))
-  #   #
-  #   #
-  #   # eum <- merge(eumpop,eumInterface, by = "Processor")
-  #   #
-  #   # #Merge fund column with unit
-  #   # eumfund$Interface_Unit<-paste(eumfund$Interface, eumfund$Unit, sep = " ")
-  #   # eum<-merge(eumfund%>%select(Processor,Interface_Unit,Value)%>%unique(),eum, by = "Processor")
-  #
-  #
-  #   Indicators<<- a
-  #   output<-paste(Indicatorshow,b,sep = " ")
-  #   boxplot <- filter(eum, Processor %in% input$ProcessorsChoice, )
-  #   bp<- ggplot(boxplot, aes(x = Processor, y = input$Indicatorshow)) + geom_boxplot()
-  #   bp
-  #
-  # })
+
   
   
   #PLOT Indicators ----
@@ -828,10 +557,10 @@ function(input, output,session) {
                     attribute = "Value",
                     nodeSize = "Value")
     
-    #   })
-    
     
   })
+  
+  
   output$Unit <- renderText({
     if (input$act==0)
       return()

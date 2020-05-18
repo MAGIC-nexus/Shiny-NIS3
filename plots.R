@@ -92,10 +92,32 @@ StackedplotBar<-function(df){
 }
 
 
+#TODO sustituir esto
+StackedPlot<-function(df,Xcol, Scope){
+  
+  barplot<-ggplot(df, aes(y = Value, x = Xcol, fill = Scope)) + geom_bar(position = 'stack' , stat = 'identity') + 
+    labs(title = "Inrterface value", y = unique(df$Unit[1])) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  return(barplot)
+}
 
 
 
+treePlot<-function(datafilter,levelList){
 
+  tree<-datafilter%>%separate(Processor,levelList, sep= "\\.")
+  tree<-collapsibleTree(df = tree, levelList,
+                  fill = "green",
+                  width = 800,
+                  # TODO controlar que el componente agregue desde el último nivel o no. En este momento está agregando aunque se le da todos los valores.
+                  # YA HE INTENTADO PONER aggfun = null PERO PARECE QUE SOLO ADMITE MEAN O SUM,,,, ESTO ES UN  PROBLEMA SOLO EN EL CASO DE CONFLICTO DE DATOS
+                  # YA QUE EN ESTE CASO SOLO SE LE DA EL RESULTADO AGREGADO BOTTON UP....
+                  zoomable = FALSE,
+                  tooltip = TRUE,
+                  attribute = "Value",
+                  nodeSize = "Value")
+  return(tree)
+}
 
 
 

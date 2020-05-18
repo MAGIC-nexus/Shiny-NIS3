@@ -1,5 +1,5 @@
 rm(list = ls())
-options(shiny.reactlog=TRUE)
+
 source('library.R')
 
 
@@ -9,6 +9,10 @@ nexinfosys <- import("nexinfosys")
 pandas<-import("pandas")
 source('plots.R')
 source('barPlot.R')
+source('Choices.R')
+source('EUM.R')
+source('tree.R')
+source('indicators.R')
 
 # py_config()
 # py_discover_config()

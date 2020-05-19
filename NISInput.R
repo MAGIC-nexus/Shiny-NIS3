@@ -1,4 +1,4 @@
-df_products_upload <- reactive({
+NisOutput <- reactive({
   inFile <- input$target_upload
   if (is.null(inFile))
     return(NULL)

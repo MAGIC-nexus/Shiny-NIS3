@@ -51,12 +51,11 @@ gg.gauge <- function(eum,breaks=values,colour) {
 #' Draw a plot that stacks Internal and external scope of interfaces, and group interfaces if they have same units 
 #' @param df is a dataset object with interfaces, processors, value and scope information at least
 
-StackedplotBarExtInt <- function(df){
+StackedplotBarsExtInt <- function(df){
   UnitList<- unique(df$Unit)
   validate(
     need(length(UnitList)==1, "Your interface selection should have the same unit") 
   )
-  # barchart <- ggplot (df, aes( x = Processor ,  y = Value, fill = Interface)) 
   
   dfInt = df[which(df$Scope == 'Internal'),]
   names(dfInt)[names(dfInt)=='Interface']<-'Interface_Internal'
@@ -78,7 +77,7 @@ StackedplotBarExtInt <- function(df){
 #'Draw a plot that  group interfaces if they have same units 
 #' @param df is a dataset object with Interfaces, Processors, Value information.
 
-StackedplotBar<-function(df){
+StackedplotBars<-function(df){
   UnitList<- unique(df$Unit)
   df$per<-round(df$Value/sum(df$Value)*100, digits = 3)
   df$names_per <-paste(df$Processor,df$per,"%", sep = " ")
@@ -109,9 +108,6 @@ treePlot<-function(datafilter,levelList){
   tree<-collapsibleTree(df = tree, levelList,
                   fill = "green",
                   width = 800,
-                  # TODO controlar que el componente agregue desde el último nivel o no. En este momento está agregando aunque se le da todos los valores.
-                  # YA HE INTENTADO PONER aggfun = null PERO PARECE QUE SOLO ADMITE MEAN O SUM,,,, ESTO ES UN  PROBLEMA SOLO EN EL CASO DE CONFLICTO DE DATOS
-                  # YA QUE EN ESTE CASO SOLO SE LE DA EL RESULTADO AGREGADO BOTTON UP....
                   zoomable = FALSE,
                   tooltip = TRUE,
                   attribute = "Value",

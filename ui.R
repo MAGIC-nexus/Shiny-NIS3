@@ -1,8 +1,8 @@
 
-shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
+shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    
                    # New tab with file input and table display -----
-                   tabPanel("INPUT FILE ",
+                   tabPanel("Nis File ",
                             sidebarLayout(
                               sidebarPanel(
                                 # fileInput('target_upload', 'Choose file to upload',
@@ -22,27 +22,36 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                               )
                             )
                     )
-                   
-                   
                    #end of Tab
-                   ,tabPanel("Bar chart by level Multi Interface",
+                   
+                   # New tab tree with quantities ----
+                   ,tabPanel("Hierarchy Viewer",
                              sidebarLayout(
                                sidebarPanel(
-                                 barPlotChoicesUI(id = 'first'),
-                                 br(),
-                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("This view of the results allows the user to relate quantities to processors 
+                                   according to hierarchy for a scenario, period and scope. The visualization provides an 
+                                   interactive display of the results by hovering over the processors"),
+              
+                                 h3(textOutput("Unit")),
+                                 ChoicesTreeUI(id = 'tree'),
+                                 
                                ),
                                mainPanel(
-                                 barPlotUI(id = 'first',stringName = 'barPlot')
+                                 treeUI(id = 'tree', StringName = 'TreeInterface' )
                                )
                              )
-                   )
-                   ,tabPanel("Bar chart by level Multi Interface Scope study ",
+                   ) #end tab  
+
+                   ,tabPanel("Level Exploration ",
                              sidebarLayout(
                                sidebarPanel(
+                                 ChoosedfUI(id = 'Scope'),
                                  barPlotChoicesUI(id = 'Scope'),
                                  br(),
-                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("In this window, the user must choose System, Period, level and the set of interface 
+                                 types with the same unit to be compared. 
+                                 The bar chart shows stacked interfaces types values by scope displaying in transparent 
+                                 colour the quantity externalized.")
                                ),
                                mainPanel(
                                  barPlotUI(id = 'Scope',stringName = 'barPlot')
@@ -50,31 +59,36 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                              )
                    )
                    #New tab with pie chart  Processots-Interfaces -----
-                   ,tabPanel("Bar chart free choice processor",
+                   ,tabPanel("Processors Exploration",
                              sidebarLayout(
                                sidebarPanel(
-                                
+                                 ChoosedfUI(id = 'processor'),
                                  barPlotChoicesMultiProcessors(id = 'processor'),
                                  br(),
-                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("For a more customized study, This tab allows the user to freely 
+                                   choose which processors to study with a multi select input of interfaces and processors.")
                                ),
                                mainPanel(
                                  barPlotUI(id = 'processor',stringName = 'barPlot')
                                )
                              )
                    )#end of Tab
-                   ,tabPanel("Study of the openess of each System",
+                   ,tabPanel("System Study",
                              sidebarLayout(
                                sidebarPanel(
+                                 ChoosedfUI(id = 'System'),
                                  barPlotChoicesUI(id = 'System'),
                                  br(),
-                                 p("This bar plot shows the contribution of the selected interfaces ( eg: water, LU..etc) to each processor of the specified level. Scenario Scope and Period needs to be chosen aswell ")
+                                 p("This tab allows to compare between different systems and study 
+                                   the externalization of the interface type chosen. The user has the 
+                                   possibility to choose the scenario, period and Interface to Study.")
                                ),
                                mainPanel(
                                  barPlotUI(id = 'System',stringName = 'barPlot')
                                )
                              )
                    )
+
                    ,tabPanel("EUM/EPM Matrix",
                              sidebarLayout(
                                sidebarPanel(
@@ -83,68 +97,54 @@ shinyUI(navbarPage("MuSIASEM data visualizations", id = "nav", inverse = TRUE,
                                  EUMChoicesUI(id = 'EUM'),
                                  p("by choosing the indicaror and level the user will be able to compare the same indicator in that level. Only indicators shoosen in EUM tab will be able to choose. The use can aswell customize zones in the gauge plot ")
                                  # TODO los funds también tendrían que ser checkboxs
-                                 
+
                                ),
-                               
+
                                mainPanel(
-                                
+
                                  excelOutput("eum") #FORMATO EXCEL
                                  # renderRpivotTable("eum") #TODO donsn't work
-                                 
+
                                )
                              )
-                   ) #end 
-                   
-                   
+                   ) #end
+
+
                    # New tab with indicators Barplot Internal vs external  -----
-                   
+
                    #TODO use fluid row https://shiny.rstudio.com/gallery/basic-datatable.html
-                   ,tabPanel("EUM/EPM bar chart",
+                   ,tabPanel("Indicator Bar Chart",
                              sidebarLayout(
                                sidebarPanel(
-                                 p("by choosing The interface types (flow types) to show,the fund interface type   and tying population a End use matrix or Environment Pressure Matrix will be show as an excel table"),
+                                 p("After creating the indicators the following screen allows a study of these 
+                                   by level and period visualizing the scope by means of a stacked bar chart."),
                                  EUMPlotChoicesUI(id = 'EUMplot')
                                ),
-                               
+
                                mainPanel(
                                  barPlotUI(id = 'EUMplot',stringName = 'barPlot')
                                )
                              )
-                   ) #end 
+                   ) #end
 
-                   ,tabPanel("INDICATORS",
+                   ,tabPanel("Benchmarks Creation",
                              sidebarLayout(
                                sidebarPanel(
-                   
+
                                 GaugeInputsUI('gauge'),
-                                 
+
                                  downloadButton("dl", "Download")
-                                 
+
                                  # actionButton("addCommands", "An action button")
-                                
-                               
+
+
                                ),
                                mainPanel(
                                  barPlotUI(id = 'gauge' , stringName = 'gaugePlot')
                                )
                           )
                    )#end
-                   
-                   # New tab tree with quantities ----
-                   ,tabPanel("Hierarchy & values Viewer",
-                             sidebarLayout(
-                               sidebarPanel(
-                                 h3(textOutput("Unit")),
-                                 ChoicesTreeUI(id = 'tree'),
-                                 br(),
-                                 p("this tree plot shows processor hierarchy and by choosing interface type the quantities will be represented by the size of nodes. if hover the values will be displayed")
-                               ),
-                               
-                               mainPanel(
-                                 treeUI(id = 'tree', StringName = 'TreeInterface' )
-                               )
-                             )
-                   ) #end tab                   
+
                                       
   )
 )#VERY END

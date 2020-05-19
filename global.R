@@ -13,6 +13,9 @@ source('Choices.R')
 source('EUM.R')
 source('tree.R')
 source('indicators.R')
+source('choosedf.R')
+
+options(shiny.reactlog = TRUE)
 
 # py_config()
 # py_discover_config()

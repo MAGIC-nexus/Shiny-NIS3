@@ -13,26 +13,26 @@ function(input, output,session) {
 
   
   #INPUT FGS XLSX ----
-  df_products_upload<- reactive({
+  NisOutput<- reactive({
     df <- pandas$read_csv('flow_graph_solution_multi_system.csv')
     df$Period<-as.character(df$Period)
     list(df1 = df, df2 = df)
   })
 
   output$FGS<- renderDataTable({
-    df <- df_products_upload()[['df1']]
+    df <- NisOutput()[['df1']]
     DT::datatable(df)
   })
 
   output$issues<- renderDataTable({
-    df <- df_products_upload()[['df2']]
+    df <- NisOutput()[['df2']]
     DT::datatable(df)
   })
   
   
   # Reactive FGS Absolute values ------
   dfAbs<-reactive({
-    df<-df_products_upload()[['df1']]
+    df<-NisOutput()[['df1']]
     
     #Cleaing
     df<-df %>% replace_na(list(Level = 'Subsystem'))
@@ -60,41 +60,45 @@ function(input, output,session) {
     })
   
   
+  df<-callModule(choosedf,'choose',dfAbs,dfIO)
  
-
- 
   
   
-  # BAR PLOT Scope choice grouped   ---------------------
-
   
-  callModule(ChoicesSPL, "first", dfIO)
-  callModule(ChoicesScope,"first",dfIO)
-  callModule(ChoicesMultiInterface,'first',dfIO)
-  callModule(MultibarPlotServer,"first",dfIO)
   
+  # # BAR PLOT Scope choice grouped   ---------------------
+  # 
+  # 
+  # df<-callModule(choosedf,'first',dfAbs,dfIO)
+  # callModule(ChoicesSPL, "first", df)
+  # callModule(ChoicesScope,"first",df)
+  # callModule(ChoicesMultiInterface,'first',df)
+  # callModule(MultibarPlotServer,"first",df)
+  #   
   # BAR PLOT SCOPES stacked  Interface grouped  ---------------------
   #TODO leyend
   # Interface grouped
-  callModule(ChoicesSPL, "Scope", dfIO)
-  callModule(ChoicesMultiInterface,'Scope',dfIO)
-  callModule(MultibarPlotServerScope,"Scope",dfIO)
+  df<-callModule(choosedf,'Scope',dfAbs,dfIO)
+  callModule(ChoicesSPL, "Scope", df)
+  callModule(ChoicesMultiInterface,'Scope',df)
+  callModule(MultibarPlotServerScope,"Scope",df)
   
   #  BAR CHART BY SYSTEM stacked subsystems  ----
-  
-  callModule(ScenarioTimeChoice,'System',dfAbs)
-  callModule(ChoicesInterface,'System',dfAbs)
-  callModule(barPlotSubsystemServer,'System',dfAbs)
+  df<-callModule(choosedf,'System',dfAbs,dfIO)
+  callModule(ScenarioTimeChoice,'System',df)
+  callModule(ChoicesInterface,'System',df)
+  callModule(barPlotSubsystemServer,'System',df)
   
   
   
   # BAR CHART BY PROCESSOR AND INTERFACE choice  ------
   # Reactive Inputs:
-  callModule(ScenarioTimeChoice, "processor", dfIO)
-  callModule(ChoicesScope,"processor",dfIO)
-  callModule(ChoicesMultiInterface,'processor',dfIO)
-  callModule(ChoicesMultiProcessor,'processor',dfIO)
-  callModule(barPlotProcessorInterfaceSertver,'processor',dfIO)
+  df<-callModule(choosedf,'System',dfAbs,dfIO)
+  callModule(ScenarioTimeChoice, "processor", df)
+  callModule(ChoicesScope,"processor",df)
+  callModule(ChoicesMultiInterface,'processor',df)
+  callModule(ChoicesMultiProcessor,'processor',df)
+  callModule(barPlotProcessorInterfaceSertver,'processor',df)
   
 
   
@@ -200,7 +204,7 @@ function(input, output,session) {
  
   # Add command   
   observeEvent(input$addCommands,{
-    c = df_products_upload()[['c']]
+    c = NisOutput()[['c']]
     c$check_backend_available()
     c$append_command('ScalarIndicators',ScalarIndicators())
     c$append_command('ScalarBenchmarks',ScalarBenchmarks())
@@ -224,7 +228,7 @@ function(input, output,session) {
     if (input$act==0)
       return()
     #    isolate({
-    data<-df_products_upload()[['df1']]
+    data<-NisOutput()[['df1']]
     Level <-as.vector(unique(data$Level))
     datafilter<-filter(data,data$Scope == input$ScopeTree, data$Period == input$PeriodTree)
     tree<-datafilter%>%separate(Processor,c(Level), sep= "\\.")
@@ -248,7 +252,7 @@ function(input, output,session) {
   output$Unit <- renderText({
     if (input$act==0)
       return()
-    data<- df_products_upload()[['df1']]
+    data<- NisOutput()[['df1']]
     Unit<- paste("Unit",filter(data,data$Interface == input$InterfaceTree2)$Unit[1],sep = "=")
     
   })  

@@ -48,79 +48,33 @@ barPlotUI <- function(id,stringName){
       #TODO  % Value
       # TODO nombre de los processors en vertical
       data<-data()
+
       df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope != 'Total')
       df <- filter(df, Interface %in% input$Interfaces, )
       validate(
         need(nrow(df)>0, "There is no data for your selection") 
       )
-      StackedplotBarExtInt(df)
+      StackedplotBarsExtInt(df)
     })
     
   }
   
-  
-  barPlotServerScope <- function(input, output, session, data){
-    
-    output$barPlot <- renderPlot({
-      data<-data()
-      df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope != 'Total', data$Interface == input$Interfaces)
-
-      validate(
-        need(nrow(df)>0, "There is no data for your selection") 
-      )
-      StackedplotBarExtInt(df)
-    })
-  }
-  
-  
-  
-  
-  
-  MultibarPlotServer <- function(input, output, session, data){
-    
-    output$barPlot <- renderPlot({
-
-      data<-data()
-      df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope == input$scope)
-      df <- filter(df, Interface %in% input$Interfaces, )
-      validate(
-        need(length(df)>0, "There is no data for your selection") 
-      )
-      StackedplotBar(df)
-    })
-    
-  }
-  
-  
-  barPlotServer <- function(input, output, session, data){
-    
-    output$barPlot <- renderPlot({
-      data<-data()
-      df <- filter(data,data$Scenario == input$scenario & data$Period == input$period & data$Level == input$level, data$Scope == input$scope, data$Interface == input$Interfaces)
-      validate(
-        need(nrow(df)>0, "There is no data for your selection") 
-      )
-      StackedplotBar(df)
-    })
-  }
   
   
   
   barPlotSubsystemServer <- function(input, output, session, data){ 
-# TODO hay algún fallo con eso  
     output$barPlot <- renderPlot({
       data<-data()
 
-      df <- filter(data, data$Scenario == input$scenario & data$Period == input$period & data$Level == "Subsystem" & data$Interface == input$Interfaces & Scope != 'Total')
+      dfplot <- filter(data, data$Scenario == input$scenario & data$Period == input$period & data$Level == "Subsystem" & data$Interface == input$Interfaces & Scope != 'Total')
 
       validate(
         need(nrow(df)>0, "There is no data for your selection") 
       )
-      barchart <- ggplot (df, aes( x = System ,  y = Value, fill = Scope)) + 
-        geom_bar( position="stack", stat = "identity") +
-        labs(title = "Inrterface value", y = unique(df$Unit)) +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
-      barchart
+      
+      
+      StackedPlot(df = dfplot, Xcol = dfplot$System, Scope = dfplot$Scope)
+      
     })
     
   }
@@ -138,7 +92,7 @@ barPlotUI <- function(id,stringName){
         need(nrow(df)>0,"There is no data for your selection")
       )
       
-    StackedplotBar(df)
+    StackedplotBars(df)
 
     })
 
@@ -156,11 +110,7 @@ barPlotUI <- function(id,stringName){
  }
  
  
- 
- 
 
-
-  
   
   
 

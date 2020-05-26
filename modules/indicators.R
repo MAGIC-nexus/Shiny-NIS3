@@ -92,11 +92,6 @@ GaugeInputsUI<-function(id){
 
 
 
-
-
-
-
-
 gaugePlotServer<-function(input,output,session,data)
   
   output$gaugePlot <- renderPlot({
@@ -109,10 +104,7 @@ gaugePlotServer<-function(input,output,session,data)
 
 
 
-
-
-
-Benchmarks<-function(input,output,session,Bench){
+Benchmarks<-function(input,output,session){
 
   ScalarBenchmarks<-reactive({
     data.frame(
@@ -124,43 +116,32 @@ Benchmarks<-function(input,output,session,Bench){
       'Category' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3),
       'Label' = c(input$ZoneName1,input$ZoneName2, input$ZoneName3)
     )    
-    
   })
+  return(ScalarBenchmarks)
 }
 
   
 
 
-
-
-
 Indicators<-function(input,output,session){
-
   ScalarIndicators<-reactive({
-    if ( input$scope == 'Local'){
+    if (input$scope == 'Local'){
       Local = 'Yes'
     }
     else{
       Local = "No"
     }
     data.frame(
-      'Indicator' = input$IndName,
+      'Indicator' = toString(input$IndName),
       'Local'= Local,
-      'Formula' = input$Indicators,
+      'Formula' = toString(input$Indicators),
       'Banchmark' = 'b1',
-      'Description' = input$Description
-      # TODO crear un contador para que vaya agregando los bechmakr
+      'Description' = toString(input$Description)
     )
   })
-  
+  return(ScalarIndicators)
+
 }
-
-
-
-
-
-
-
   
   
   

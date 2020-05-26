@@ -38,10 +38,6 @@ barPlotUI <- function(id,stringName){
 }
 
 
-
-
-
-
   MultibarPlotServerScope <- function(input, output, session, data){
     
     output$barPlot <- renderPlot({
@@ -54,11 +50,10 @@ barPlotUI <- function(id,stringName){
       validate(
         need(nrow(df)>0, "There is no data for your selection") 
       )
-      StackedplotBarsExtInt(df)
+      dodgefacetsbarScopes(df)
     })
     
   }
-  
   
   
   
@@ -95,11 +90,8 @@ barPlotUI <- function(id,stringName){
     StackedplotBars(df)
 
     })
-
   }
   
-  
- 
  
  
 

@@ -219,5 +219,3 @@ ChoicesIndicator<-function(input, output, session, data){
 
 
 
-
-

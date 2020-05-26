@@ -8,6 +8,11 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                 # fileInput('target_upload', 'Choose file to upload',
                                           # accept =".xlsx"),
                                 NisOutputUI('input'),
+                                ChoosedfUI(id = 'bars'),
+                                p('By activating this option, if there are inputs and outputs of the same type of interface 
+                                for the same processor, the bar graph in thest three tabs will show the balance of these by processor. 
+                                If not, the inputs will be seen as positive and the outputs as negative.
+                                Note that the other tabs will use the balance (outputs - inputs) of each type of interface by processor')
                                 # actionButton("act","click to update dataset input")
                                 #TODO controlar que estos mensajes salgan antes de que salga la tabla
                                 # textOutput("num_errors"),
@@ -24,28 +29,12 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                     )
                    #end of Tab
                    
-                   # New tab tree with quantities ----
-                   ,tabPanel("Hierarchy Viewer",
-                             sidebarLayout(
-                               sidebarPanel(
-                                 p("This view of the results allows the user to relate quantities to processors
-                                   according to hierarchy for a scenario, period and scope. The visualization provides an
-                                   interactive display of the results by hovering over the processors"),
-
-                                 
-                                 ChoicesTreeUI(id = 'tree'),
-
-                               ),
-                               mainPanel(
-                                 treeUI(id = 'tree', StringName = 'TreeInterface' )
-                               )
-                             )
-                   ) #end tab
+                
 
                    ,tabPanel("Level Exploration ",
                              sidebarLayout(
                                sidebarPanel(
-                                 ChoosedfUI(id = 'Scope'),
+                                 
                                  barPlotChoicesUI(id = 'Scope'),
                                  br(),
                                  p("In this window, the user must choose System, Period, level and the set of interface
@@ -62,7 +51,6 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ,tabPanel("Processors Exploration",
                              sidebarLayout(
                                sidebarPanel(
-                                 ChoosedfUI(id = 'processor'),
                                  barPlotChoicesMultiProcessors(id = 'processor'),
                                  br(),
                                  p("For a more customized study, This tab allows the user to freely
@@ -76,7 +64,6 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ,tabPanel("System Study",
                              sidebarLayout(
                                sidebarPanel(
-                                 ChoosedfUI(id = 'System'),
                                  barPlotChoicesUI(id = 'System'),
                                  br(),
                                  p("This tab allows to compare between different systems and study
@@ -88,6 +75,29 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                )
                              )
                    )
+                   
+                   
+            
+                   
+                   # New tab tree with quantities ----
+                   ,tabPanel("Hierarchy Viewer",
+                             sidebarLayout(
+                               sidebarPanel(
+                                 p("This view of the results allows the user to relate quantities to processors
+                                   according to hierarchy for a scenario, period and scope. The visualization provides an
+                                   interactive display of the results by hovering over the processors"),
+                                 
+                                 
+                                 ChoicesTreeUI(id = 'tree')
+                                 
+                               ),
+                               mainPanel(
+                                 treeUI(id = 'tree', StringName = 'TreeInterface' )
+                               )
+                             )
+                   ) #end tab
+                   
+                   
                    ,tabPanel("EUM/EPM Matrix",
                              sidebarLayout(
                                sidebarPanel(
@@ -95,14 +105,12 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                  numericInput("Population", "Population", 100000),
                                  EUMChoicesUI(id = 'EUM'),
                                  p("by choosing the indicaror and level the user will be able to compare the same indicator in that level. Only indicators shoosen in EUM tab will be able to choose. The use can aswell customize zones in the gauge plot ")
-                                 # TODO los funds también tendrían que ser checkboxs
 
                                ),
 
                                mainPanel(
 
-                                 excelOutput("eum") #FORMATO EXCEL
-                                 # renderRpivotTable("eum") #TODO donsn't work
+                                 excelOutput("eum") #excel format
 
                                )
                              )
@@ -125,6 +133,8 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                )
                              )
                    ) #end
+                   
+                
 
                    ,tabPanel("Benchmarks Creation",
                              sidebarLayout(
@@ -132,9 +142,11 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
 
                                 GaugeInputsUI('gauge'),
 
-                                 downloadButton("dl", "Download"),
+                                 downloadButton("dl", "Download Commands"),
 
-                                 actionButton("addIndBench", "An action button")
+                                 actionButton("addCommands", "Ad Commands to Model"),
+                                  
+                                downloadButton("dl2", "Download Model")
 
 
                                ),

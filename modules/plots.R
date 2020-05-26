@@ -1,4 +1,4 @@
-#' Draq a gauge plot
+#'gauge plot
 #' @param eum is the input dataset with indicators 
 #' @param breaks describes ranges
 #' @param colours specified colors per range in the same order
@@ -6,8 +6,7 @@
 
 
 gg.gauge <- function(eum,breaks=values,colour) {
-  # rescale <- function(x) (x-min(x))/(max(x) - min(x)) * 100
-  # rescale<-function(x) x*1000
+
   require(ggplot2)
   get.poly <- function(a,b,l = breaks[4],r1=0.5,r2=1.0) {
     th.start <- pi*(1-a/l)
@@ -62,16 +61,30 @@ StackedplotBarsExtInt <- function(df){
   dfExt = df[which(df$Scope == 'External'),]
   names(dfExt)[names(dfExt)=='Interface']<-'Interface_External'
   
-    # TODO no consigo que salga la leyenda de external...... 
+    # there is no legend for alpha = 0.5 bars
     # código https://stackoverflow.com/questions/38070878/r-stacked-grouped-barplot-with-different-fill-in-r
+
     barchart<-ggplot() +
       geom_bar(data = dfInt, aes( x = Processor ,  y = Value, fill = Interface_Internal), position="dodge", stat = "identity", show.legend = TRUE) +
       theme(legend.position = 'botton')+
+
       geom_bar(data = dfExt, aes( x = Processor ,  y = Value, fill = Interface_External), position="dodge", stat = "identity",alpha=0.5, show.legend = TRUE, inherit.aes = TRUE) +
       theme(legend.position = 'top')+
+
       labs(title = "Inrterface value", y = unique(df$Unit)) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     return(barchart)
+}
+
+
+dodgefacetsbarScopes<-function(df){
+  
+  barchart<- ggplot(df, aes(x = Processor, y = Value, fill = Scope)) +
+    geom_bar(position = "stack", stat = "identity") +
+    facet_wrap( ~ Interface)+
+    labs(title = "Inrterface value", y = unique(df$Unit)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  return(barchart)  
 }
 
 #'Draw a plot that  group interfaces if they have same units 

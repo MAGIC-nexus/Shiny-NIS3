@@ -24,7 +24,7 @@ EUMPlotChoicesUI<-function(id){
 
 
 
-EUM<-function(input,output,session,data){
+matrixEUM<-function(input,output,session,data){
  
   EUM<-reactive({
     data<-data()
@@ -101,6 +101,17 @@ EUM<-function(input,output,session,data){
    
     
    
+
+batPlotEUMScope<-function(input, output, session, data){
+  
+  output$barPlot<-renderPlot({
+    df<- data()
+    dfplot<-filter(df, indicator == input$indicator, Level == input$level, Period == input$period, Scope != 'Total') #tabla con 1 indicador varios sistemas agrupados por externo e interno 
+    StackedPlot(df = dfplot, Xcol = dfplot$Processor, Scope = dfplot$Scope)
+  })
+  
+}
+
     
     
     

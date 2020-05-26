@@ -1,3 +1,23 @@
+ChoosedfUI<-function(id){
+  ns<-NS(id)
+  checkboxInput(ns("Absolute"), label = "See Absolute Values", value = TRUE)
+}
+
+
+
+choosedf<-function(input,ouput,session,dfAbs,dfIO){
+  df<-reactive({
+    if (input$Absolute == TRUE){
+      df<-dfAbs()
+    }else{
+      df<-dfIO()
+    }
+  })
+  return(df)  
+}
+
+
+
 barPlotChoicesUI <- function(id){
   
   ns <- NS(id) 
@@ -14,7 +34,7 @@ barPlotChoicesUI <- function(id){
 
 
 
-ChoicesSPL <- function(input, output, session, data){  #eee
+ChoicesSPL <- function(input, output, session, data){  
   
   output$scenario = renderUI({
     datos<-data()

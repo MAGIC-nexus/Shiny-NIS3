@@ -6,9 +6,9 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                             sidebarLayout(
                               sidebarPanel(
                                 # fileInput('target_upload', 'Choose file to upload',
-                                #           accept =".xlsx"
-                                #           ),
-                                actionButton("act","click to update dataset input")
+                                          # accept =".xlsx"),
+                                NisOutputUI('input'),
+                                # actionButton("act","click to update dataset input")
                                 #TODO controlar que estos mensajes salgan antes de que salga la tabla
                                 # textOutput("num_errors"),
                                 # textOutput("opened"),
@@ -28,19 +28,19 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ,tabPanel("Hierarchy Viewer",
                              sidebarLayout(
                                sidebarPanel(
-                                 p("This view of the results allows the user to relate quantities to processors 
-                                   according to hierarchy for a scenario, period and scope. The visualization provides an 
+                                 p("This view of the results allows the user to relate quantities to processors
+                                   according to hierarchy for a scenario, period and scope. The visualization provides an
                                    interactive display of the results by hovering over the processors"),
-              
-                                 h3(textOutput("Unit")),
-                                 ChoicesTreeUI(id = 'tree'),
+
                                  
+                                 ChoicesTreeUI(id = 'tree'),
+
                                ),
                                mainPanel(
                                  treeUI(id = 'tree', StringName = 'TreeInterface' )
                                )
                              )
-                   ) #end tab  
+                   ) #end tab
 
                    ,tabPanel("Level Exploration ",
                              sidebarLayout(
@@ -48,9 +48,9 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                  ChoosedfUI(id = 'Scope'),
                                  barPlotChoicesUI(id = 'Scope'),
                                  br(),
-                                 p("In this window, the user must choose System, Period, level and the set of interface 
-                                 types with the same unit to be compared. 
-                                 The bar chart shows stacked interfaces types values by scope displaying in transparent 
+                                 p("In this window, the user must choose System, Period, level and the set of interface
+                                 types with the same unit to be compared.
+                                 The bar chart shows stacked interfaces types values by scope displaying in transparent
                                  colour the quantity externalized.")
                                ),
                                mainPanel(
@@ -65,7 +65,7 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                  ChoosedfUI(id = 'processor'),
                                  barPlotChoicesMultiProcessors(id = 'processor'),
                                  br(),
-                                 p("For a more customized study, This tab allows the user to freely 
+                                 p("For a more customized study, This tab allows the user to freely
                                    choose which processors to study with a multi select input of interfaces and processors.")
                                ),
                                mainPanel(
@@ -79,8 +79,8 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                  ChoosedfUI(id = 'System'),
                                  barPlotChoicesUI(id = 'System'),
                                  br(),
-                                 p("This tab allows to compare between different systems and study 
-                                   the externalization of the interface type chosen. The user has the 
+                                 p("This tab allows to compare between different systems and study
+                                   the externalization of the interface type chosen. The user has the
                                    possibility to choose the scenario, period and Interface to Study.")
                                ),
                                mainPanel(
@@ -88,7 +88,6 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                )
                              )
                    )
-
                    ,tabPanel("EUM/EPM Matrix",
                              sidebarLayout(
                                sidebarPanel(
@@ -116,7 +115,7 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ,tabPanel("Indicator Bar Chart",
                              sidebarLayout(
                                sidebarPanel(
-                                 p("After creating the indicators the following screen allows a study of these 
+                                 p("After creating the indicators the following screen allows a study of these
                                    by level and period visualizing the scope by means of a stacked bar chart."),
                                  EUMPlotChoicesUI(id = 'EUMplot')
                                ),
@@ -133,9 +132,9 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
 
                                 GaugeInputsUI('gauge'),
 
-                                 downloadButton("dl", "Download")
+                                 downloadButton("dl", "Download"),
 
-                                 # actionButton("addCommands", "An action button")
+                                 actionButton("addIndBench", "An action button")
 
 
                                ),

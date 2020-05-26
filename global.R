@@ -5,15 +5,15 @@ source('library.R')
 
 
 use_python("/opt/conda/bin/python3", required = TRUE)
+# use_condaenv('NIS')
 nexinfosys <- import("nexinfosys")
-pandas<-import("pandas")
-source('plots.R')
-source('barPlot.R')
-source('Choices.R')
-source('EUM.R')
-source('tree.R')
-source('indicators.R')
-source('choosedf.R')
+# pandas<-import("pandas")
+
+# source shiny module files
+invisible(sapply(list.files('modules', full.names = TRUE), source))
+
+
+
 
 options(shiny.reactlog = TRUE)
 

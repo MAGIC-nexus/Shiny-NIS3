@@ -69,10 +69,10 @@ barPlotUI <- function(id,stringName){
       dfplot <- filter(data, data$Scenario == input$scenario & data$Period == input$period & data$Level == "Subsystem" & data$Interface == input$Interfaces & Scope != 'Total')
 
       validate(
-        need(nrow(df)>0, "There is no data for your selection") 
+        need(nrow(dfplot)>0, "There is no data for your selection") 
       )
       
-      
+
       StackedPlot(df = dfplot, Xcol = dfplot$System, Scope = dfplot$Scope)
       
     })
@@ -99,15 +99,7 @@ barPlotUI <- function(id,stringName){
   }
   
   
- batPlotEUMScope<-function(input, output, session, data){
-   
-   output$barPlot<-renderPlot({
-     df<- data()
-     dfplot<-filter(df, indicator == input$indicator, Level == input$level, Period == input$period, Scope != 'Total') #tabla con 1 indicador varios sistemas agrupados por externo e interno 
-    StackedPlot(df = dfplot, Xcol = dfplot$Processor, Scope = dfplot$Scope)
-   })
-   
- }
+ 
  
  
 

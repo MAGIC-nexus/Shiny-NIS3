@@ -112,7 +112,7 @@ gaugePlotServer<-function(input,output,session,data)
 
 
 
-Benchmarks<-function(input,output,session){
+Benchmarks<-function(input,output,session,Bench){
 
   ScalarBenchmarks<-reactive({
     data.frame(
@@ -126,8 +126,10 @@ Benchmarks<-function(input,output,session){
     )    
     
   })
-
 }
+
+  
+
 
 
 

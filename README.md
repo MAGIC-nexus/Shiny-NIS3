@@ -5,25 +5,24 @@ NIS EDA is a dashboard designed to allow initial exploration of results of a NIS
 It is a Shiny application which can be deployed using Docker images built using one of the two supplied Dockerfiles: one is for continuation of the development, RStudio+Shiny (rstudio_docker/Dockerfile), the other is for execution, containing just Shiny (Dockerfile).
 
 ## Connection to Nis-Backend
-Connection to Nis-Backend is ready for a local installation see  https://github.com/MAGIC-nexus/nis-backend to use other connections (as Unina server) change nisbackend files
+Connection to a Nis-Backend instance running locally (at 127.0.0.1) is provided as example. See  https://github.com/MAGIC-nexus/nis-backend to see how to install "nis-backend". To use other connections (as Unina server) change the URL in "nisbackend.R" file.
 
 ### Files and Modules Organization
 
-- nis-EDA
-- Library.R
+- library.R
 - nisbackend.R
-- README.R
+- README.md
 - global.R
-- Server.R
+- server.R
 - ui.R
-- Modules
+- modules/
   - barPlots.R
   - EUM.R
   - tree.R
   - plots.R
   - indicators.R
   - Choices.R
-  - NiSInput.R
+  - NISInput.R
 
 ### Modules Description
 

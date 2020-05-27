@@ -5,19 +5,12 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    tabPanel("Nis File ",
                             sidebarLayout(
                               sidebarPanel(
-                                # fileInput('target_upload', 'Choose file to upload',
-                                          # accept =".xlsx"),
                                 NisOutputUI('input'),
                                 ChoosedfUI(id = 'bars'),
                                 p('By activating this option, if there are inputs and outputs of the same type of interface 
                                 for the same processor, the bar graph in thest three tabs will show the balance of these by processor. 
                                 If not, the inputs will be seen as positive and the outputs as negative.
                                 Note that the other tabs will use the balance (outputs - inputs) of each type of interface by processor')
-                                # actionButton("act","click to update dataset input")
-                                #TODO controlar que estos mensajes salgan antes de que salga la tabla
-                                # textOutput("num_errors"),
-                                # textOutput("opened"),
-                                # textOutput("worksheets")
                               ),
                               mainPanel(
                                 tabsetPanel(
@@ -34,7 +27,6 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ,tabPanel("Level Exploration ",
                              sidebarLayout(
                                sidebarPanel(
-                                 
                                  barPlotChoicesUI(id = 'Scope'),
                                  br(),
                                  p("In this window, the user must choose System, Period, level and the set of interface
@@ -158,4 +150,4 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
 
                                       
   )
-)#VERY END
+)#END

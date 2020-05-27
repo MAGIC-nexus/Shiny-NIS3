@@ -16,8 +16,7 @@ NisOutput<-function(input,output,session){
     if (is.null(inFile))
       return(NULL)
     filename <- inFile$datapath
-    # c <- nexinfosys$NISClient("https://one.nis.magic-nexus.eu/nis_api")
-    c <- nexinfosys$NISClient("http://172.17.0.1:5000/nis_api")
+    c <- nexinfosys$NISClient(nisbackend)
     fname <- filename
     try({print(c$close_session())
       print(c$logout())

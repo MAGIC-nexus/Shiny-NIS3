@@ -42,7 +42,8 @@ RUN install2.r --error --repos='http://cran.rstudio.com/' \
     collapsibleTree \
     rlist \
     rhandsontable \
-    shinyjs
+    shinyjs \
+    writexl
 
 ENV PATH /opt/conda/bin:$PATH
 ENV RETICULATE_PYTHON /opt/conda/bin/python3

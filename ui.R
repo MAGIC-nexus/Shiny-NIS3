@@ -39,7 +39,7 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                                )
                              )
                    )
-                   #New tab with pie chart  Processots-Interfaces -----
+                   #New tab  -----
                    ,tabPanel("Processors Exploration",
                              sidebarLayout(
                                sidebarPanel(
@@ -71,7 +71,7 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    
             
                    
-                   # New tab tree with quantities ----
+                   # New tab  ----
                    ,tabPanel("Hierarchy Viewer",
                              sidebarLayout(
                                sidebarPanel(
@@ -89,7 +89,7 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                              )
                    ) #end tab
                    
-                   
+                   # New tab  ----
                    ,tabPanel("EUM/EPM Matrix",
                              sidebarLayout(
                                sidebarPanel(
@@ -109,9 +109,9 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ) #end
 
 
-                   # New tab with indicators Barplot Internal vs external  -----
+                   # New tab  -----
 
-                   #TODO use fluid row https://shiny.rstudio.com/gallery/basic-datatable.html
+         
                    ,tabPanel("Indicator Bar Chart",
                              sidebarLayout(
                                sidebarPanel(
@@ -127,7 +127,8 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
                    ) #end
                    
                 
-
+                   # New tab  -----
+                   
                    ,tabPanel("Benchmarks Creation",
                              sidebarLayout(
                                sidebarPanel(
@@ -136,9 +137,9 @@ shinyUI(navbarPage("Nis-EDA", id = "nav", inverse = TRUE,
 
                                  downloadButton("dl", "Download Commands"),
 
-                                 actionButton("addCommands", "Ad Commands to Model"),
+                                 # actionButton("addCommands", "Ad Commands to Model"), #it works but have no functionalities
                                   
-                                downloadButton("dl2", "Download Model")
+             
 
 
                                ),

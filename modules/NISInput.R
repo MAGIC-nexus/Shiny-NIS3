@@ -3,7 +3,7 @@ NisOutputUI<-function(id){
   
   ns<-NS(id)
   
-  fileInput(ns('target_upload'), 'Choose file to upload',
+  fileInput(ns('target_upload'), 'Choose file to upload (Nis Format .xlsx file)',
             accept =".xlsx")
 }
 

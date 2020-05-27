@@ -11,7 +11,7 @@ Connection to Nis-Backend is ready for a local installation see  https://github.
 
 - nis-EDA
 - Library.R
-- nisbackned.R
+- nisbackend.R
 - README.R
 - global.R
 - Server.R

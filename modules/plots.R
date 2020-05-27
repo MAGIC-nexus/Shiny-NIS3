@@ -1,10 +1,4 @@
 #'gauge plot
-#' @param eum is the input dataset with indicators 
-#' @param breaks describes ranges
-#' @param colours specified colors per range in the same order
-
-
-
 gg.gauge <- function(eum,breaks=values,colour) {
 
   require(ggplot2)
@@ -48,7 +42,6 @@ gg.gauge <- function(eum,breaks=values,colour) {
 
 
 #' Draw a plot that stacks Internal and external scope of interfaces, and group interfaces if they have same units 
-#' @param df is a dataset object with interfaces, processors, value and scope information at least
 
 StackedplotBarsExtInt <- function(df){
   UnitList<- unique(df$Unit)
@@ -76,7 +69,7 @@ StackedplotBarsExtInt <- function(df){
     return(barchart)
 }
 
-
+#' Draw a plot that stacks Internal and external scope of interfaces, and group interfaces if they have same units in facets
 dodgefacetsbarScopes<-function(df){
   
   barchart<- ggplot(df, aes(x = Processor, y = Value, fill = Scope)) +
@@ -88,7 +81,7 @@ dodgefacetsbarScopes<-function(df){
 }
 
 #'Draw a plot that  group interfaces if they have same units 
-#' @param df is a dataset object with Interfaces, Processors, Value information.
+
 
 StackedplotBars<-function(df){
   UnitList<- unique(df$Unit)
@@ -104,7 +97,7 @@ StackedplotBars<-function(df){
 }
 
 
-#TODO sustituir esto
+#'Draw stacked plot 
 StackedPlot<-function(df,Xcol, Scope){
   
   barplot<-ggplot(df, aes(y = Value, x = Xcol, fill = Scope)) + geom_bar(position = 'stack' , stat = 'identity') + 
@@ -114,7 +107,7 @@ StackedPlot<-function(df,Xcol, Scope){
 }
 
 
-
+#'Draw a hierarchy plot that show interfaces values when hovering
 treePlot<-function(datafilter,levelList){
 
   tree<-datafilter%>%separate(Processor,levelList, sep= "\\.")

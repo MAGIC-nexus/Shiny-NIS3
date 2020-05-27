@@ -11,10 +11,10 @@ function(input, output,session) {
 
   # # INPUT FILE TO NIS ----  
 
-  
-  # INPUT FGS XLSX for testing ----
+
+  # INPUT FGS XLSX for faster testing ----
   # NisOutput<- reactive({
-  #   df <- pandas$read_csv('flow_graph_solution_multi_system.csv')
+  #   df <- pandas$read_csv('flow_graph_solution.csv')
   #   df$Period<-as.character(df$Period)
   #   list(df1 = df, df2 = df)
   # })
@@ -37,12 +37,12 @@ function(input, output,session) {
   dfAbs<-reactive({
     df<-NisOutput()[['df1']]
     
-    #Cleaing
+    #Cleaning
     df<-df %>% replace_na(list(Level = 'Subsystem'))
     df[is.na(df)] <- "Subsystem"
     
     
-    # Select oly useful data for analysis
+    # Select only useful data for analysis
     df<- filter(df, Conflict_Partof != 'Dismissed', Conflict_Itype != 'Dismissed')
     cols<- c('Scenario','Period','Scope','Processor','Interface','Orientation','RoegenType','Value','Unit','Level','System','Subsystem','Sphere')
     df<-subset(df,select = cols)
@@ -64,21 +64,11 @@ function(input, output,session) {
   
  
   df<-callModule(choosedf,'bars',dfAbs,dfIO)
-  #
-  # BAR PLOT SCOPES stacked  Interface grouped  ---------------------
-  #TODO leyend
-  # Interface grouped
   
+  # BAR PLOT SCOPES stacked  Interface grouped  ---------------------
   callModule(ChoicesSPL, "Scope", df)
   callModule(ChoicesMultiInterface,'Scope',df)
   callModule(MultibarPlotServerScope,"Scope",df)
-  # callModule(downloadablePlot,
-  #            "Scope",
-  #            logger = ss_userAction.Log,
-  #            filenameroot = "mydownload1",
-  #            aspectratio = 1.33,
-  #            downloadfxns = list(png = myplotfxn, tsv = mydatafxn),
-  #            visibleplot = myplotfxn)
 
   #  BAR CHART BY SYSTEM stacked subsystems  ----
   callModule(ScenarioTimeChoice,'System',df)
@@ -88,7 +78,6 @@ function(input, output,session) {
 
 
   # BAR CHART BY PROCESSOR AND INTERFACE choice  ------
-  # Reactive Inputs:
   callModule(ScenarioTimeChoice, "processor", df)
   callModule(ChoicesScope,"processor",df)
   callModule(ChoicesMultiInterface,'processor',df)
@@ -98,17 +87,7 @@ function(input, output,session) {
 
   
   
-  # new Reactive EUM (all indicators in the same column) ----
-  
-
-  
-  #eum formato corto ----
-
-  # EUM -----
-  #Reactive Inputs
-
-
-
+  # new Reactive EUM ----
 
   callModule(ChoicesScenario,'EUM',dfAbs)
   callModule(ChoicesPeriod,'EUM',dfAbs)
@@ -117,7 +96,7 @@ function(input, output,session) {
   callModule(ChoicesFlow,'EUM',dfAbs)
   callModule(ChoicesFund,'EUM',dfAbs)
 
-
+  # reactive dataframes for indicators ------
   totalEUM<-callModule(matrixEUM,'EUM',dfAbs)
   ShortEUM<-callModule(IndicatorsEUM,'EUM',totalEUM)
 
@@ -125,7 +104,6 @@ function(input, output,session) {
 
 
   #EUM output en formato excel ----
-
   output$eum<-renderExcel({
     excelTable(data = ShortEUM())
   })
@@ -135,8 +113,6 @@ function(input, output,session) {
 
 
   #PLOT Indicators ----
-  #inputs
-
   callModule(ChoicesIndicator,'EUMplot',totalEUM)
   callModule(ChoicesLevel,'EUMplot',totalEUM)
   callModule(ChoicesPeriod,'EUMplot',totalEUM)
@@ -145,8 +121,8 @@ function(input, output,session) {
 
 
 
-   # Gauge tab ---
 
+   # Gauge Plot ---
   callModule(ChoicesIndicator,'gauge',totalEUM)
   callModule(ChoicesLevel,'gauge',totalEUM)
   callModule(ChoicesPeriod,'gauge',totalEUM)
@@ -156,7 +132,6 @@ function(input, output,session) {
 
 
   #Create command -----
-
   ScalarBenchmarks<-callModule(Benchmarks,'gauge')
   ScalarIndicators<-callModule(Indicators,'gauge')
   
@@ -172,7 +147,6 @@ function(input, output,session) {
     })
 
   # download Commands xlsx
-
   output$dl <- downloadHandler(
     filename = function() {"Indicators.xlsx"},
     content = function(file) {write_xlsx(list(
@@ -180,18 +154,8 @@ function(input, output,session) {
       ScalarBenchmarks = ScalarBenchmarks()), path = file)}
     )
   
-  
-  
-  output$dl <- downloadHandler(
-    filename = function() {"Indicators.xlsx"},
-    content = function(file) {write_xlsx(list(
-      ScalarIndicators = ScalarIndicators(),
-      ScalarBenchmarks = ScalarBenchmarks()), path = file)}
-  )
 
   # TREE ----
-  # REACTIVE INPUTS
-
   callModule(ChoicesScope,'tree',dfAbs)
   callModule(ChoicesPeriod,'tree',dfAbs)
   callModule(ChoicesInterface,'tree',dfAbs)

@@ -33,7 +33,7 @@ barPlotChoicesMultiProcessors<-function(id){
 barPlotUI <- function(id,stringName){
   ns <- NS(id) 
   tagList(
-    plotOutput(ns(stringName))
+    plotOutput(ns(stringName), height = 1000, width = 1000)
   )
 }
 
@@ -51,7 +51,9 @@ barPlotUI <- function(id,stringName){
         need(nrow(df)>0, "There is no data for your selection") 
       )
       dodgefacetsbarScopes(df)
+      
     })
+    
     
   }
   

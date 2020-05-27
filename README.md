@@ -27,11 +27,11 @@ Connection to Nis-Backend is ready for a local installation see  https://github.
 
 ### Modules Description
 
-barPlots.R: Contains all the modules related to the bar graphs.
-Choices.R : Modules that build the selectors such as scope, period, scenario, etc. that are repeated throughout the application to perform the filterings.
-EUM.R: Modules that build the necessary reactives datasets to create the EUM matrix
-indicators.R: Inputs and outputs necessary to create the scalarBenchmark, Scalar indicator  and gauge graph output.
-tree.R: Modules to create the hierarchy visualization
-plots.R: Functions to create the different charts such as bar charts and gauge plot
-NISInput.R Function that calls NIS Client and generates Flow Graph Solution and Issues Data frames.
+- barPlots.R: Contains all the modules related to the bar graphs.
+- Choices.R : Modules that build the selectors such as scope, period, scenario, etc. that are repeated throughout the application to perform the filterings.
+- EUM.R: Modules that build the necessary reactives datasets to create the EUM matrix
+- indicators.R: Inputs and outputs necessary to create the scalarBenchmark, Scalar indicator  and gauge graph output.
+- tree.R: Modules to create the hierarchy visualization
+- plots.R: Functions to create the different charts such as bar charts and gauge plot
+- NISInput.R Function that calls NIS Client and generates Flow Graph Solution and Issues Data frames.
 

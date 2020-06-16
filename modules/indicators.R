@@ -131,10 +131,11 @@ Indicators<-function(input,output,session){
     else{
       Local = "No"
     }
+    browser()
     data.frame(
       'Indicator' = toString(input$IndName),
       'Local'= Local,
-      'Formula' = toString(input$Indicators),
+      'Formula' = toString(input$indicator),
       'Banchmark' = 'b1',
       'Description' = toString(input$Description)
     )

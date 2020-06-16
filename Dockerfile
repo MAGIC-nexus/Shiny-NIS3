@@ -9,7 +9,7 @@
 # Latest version at https://github.com/MAGIC-nexus/nis-eda
 #
 
-FROM rocker/shiny
+FROM rocker/shiny:4.0.0
 
 RUN apt-get -y update && apt-get -y upgrade && \
     apt-get -y install \
